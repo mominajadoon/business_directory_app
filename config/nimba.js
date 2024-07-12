@@ -1,6 +1,6 @@
 const axios = require("axios");
 const dotenv = require("dotenv");
-const User = require("../models/User");
+const User = require("../Models/User");
 dotenv.config();
 
 const apiClient = axios.create({

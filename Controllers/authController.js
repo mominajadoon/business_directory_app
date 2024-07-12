@@ -1,4 +1,4 @@
-const User = require("../models/User");
+const User = require("../Models/User");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const { sendOtpToUser, apiClient } = require("../config/nimba");
