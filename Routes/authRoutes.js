@@ -6,10 +6,12 @@ const {
   forgotPassword,
   resendOtp,
   newPassword,
+  login,
 } = require("../Controllers/authController");
 
 router.post("/register", register);
 // signin
+router.post("/login", login);
 router.post("/verify-otp", verifyOtp);
 router.post("/resend-otp", resendOtp);
 router.post("/forgot-password", forgotPassword);

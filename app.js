@@ -2,6 +2,8 @@ const express = require("express");
 const dotenv = require("dotenv");
 const connectDB = require("./config/db");
 const authRoutes = require("./Routes/authRoutes.js");
+const businessRoutes = require("./Routes/businessRoutes.js");
+const eventRoutes = require("./Routes/eventRoutes.js");
 
 dotenv.config();
 
@@ -15,6 +17,8 @@ app.use(express.json());
 
 // Routes
 app.use("/api/auth", authRoutes);
+app.use("/api/business", businessRoutes);
+app.use("/api/event", eventRoutes);
 
 const PORT = process.env.PORT || 5000;
 

@@ -39,6 +39,56 @@ exports.register = async (req, res) => {
     res.status(500).send("Server Error");
   }
 };
+
+// Login User
+exports.login = async (req, res) => {
+  const { phone, password } = req.body;
+
+  try {
+    // Validate input fields
+    if (!phone || !password) {
+      return res.status(400).json({ msg: "Please enter all fields" });
+    }
+
+    // Check if user exists
+    const user = await User.findOne({ phone });
+    if (!user) {
+      return res.status(400).json({ msg: "Invalid credentials" });
+    }
+
+    // Check if password matches
+    const isMatch = await bcrypt.compare(password, user.password);
+    if (!isMatch) {
+      return res.status(400).json({ msg: "Invalid credentials" });
+    }
+
+    // Check if user is verified
+    if (!user.isVerified) {
+      return res.status(400).json({ msg: "Please verify your account" });
+    }
+
+    // Generate JWT
+    const payload = {
+      user: {
+        id: user.id,
+      },
+    };
+
+    jwt.sign(
+      payload,
+      process.env.JWT_SECRET,
+      { expiresIn: "1h" },
+      (err, token) => {
+        if (err) throw err;
+        res.json({ token });
+      }
+    );
+  } catch (error) {
+    console.error(error);
+    res.status(500).send("Server Error");
+  }
+};
+
 // Verify OTP
 exports.verifyOtp = async (req, res) => {
   const { phone, otp } = req.body;

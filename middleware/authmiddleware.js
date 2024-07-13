@@ -1,15 +1,33 @@
-// const express = require("express");
-// const router = express.Router();
-// const {
-//   register,
-//   verifyOtp,
-//   forgotPassword,
-//   resetPassword,
-// } = require("../Controllers/authController");
+const jwt = require("jsonwebtoken");
+const User = require("../Models/User");
 
-// router.post("/register", register);
-// router.post("/verify-otp", verifyOtp);
-// router.post("/forgot-password", forgotPassword);
-// router.post("/reset-password", resetPassword);
+exports.isAuthenticated = async (req, res, next) => {
+  const token = req.header("Authorization");
 
-// module.exports = router;
+  if (!token) {
+    return res.status(401).json({ msg: "No token, authorization denied" });
+  }
+
+  try {
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    req.user = decoded.user;
+    const user = await User.findById(req.user.id);
+
+    if (!user) {
+      return res
+        .status(401)
+        .json({ msg: "User not found, authorization denied" });
+    }
+
+    next();
+  } catch (error) {
+    res.status(401).json({ msg: "Token is not valid" });
+  }
+};
+
+exports.isAdmin = (req, res, next) => {
+  if (req.user.role !== "admin") {
+    return res.status(403).json({ msg: "Admin resource, access denied" });
+  }
+  next();
+};
