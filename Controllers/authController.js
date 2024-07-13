@@ -73,7 +73,7 @@ exports.login = async (req, res) => {
         id: user.id,
       },
     };
-
+    //line added
     jwt.sign(
       payload,
       process.env.JWT_SECRET,
