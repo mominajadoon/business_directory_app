@@ -16,5 +16,5 @@ router.delete("/delete/:id", isAuthenticated, deleteEvent);
 router.put("/approve/:id", isAdmin, approveEvent);
 router.put("/like/:id", isAuthenticated, likeEvent);
 router.post("/comment/:id", isAuthenticated, commentEvent);
-
+//export
 module.exports = router;
