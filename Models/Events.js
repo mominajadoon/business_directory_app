@@ -4,6 +4,10 @@ const EventSchema = new mongoose.Schema(
   {
     image: { type: String, required: true },
     description: { type: String, required: true },
+    eventName: { type: String, required: true },
+    date: { type: Date, required: true },
+    time: { type: String, required: true },
+    location: { type: String, required: true },
     createdBy: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "User",

@@ -1,13 +1,17 @@
 const Event = require("../Models/Events");
 
 exports.addEvent = async (req, res) => {
-  const { image, description } = req.body;
-  const createdBy = req.user.id; // Assuming you have user ID in request after authentication
+  const { image, description, eventName, date, time, location } = req.body;
+  const createdBy = req.user.id;
 
   try {
     const newEvent = new Event({
       image,
       description,
+      eventName,
+      date,
+      time,
+      location,
       createdBy,
       isApproved: false,
     });
@@ -22,31 +26,38 @@ exports.addEvent = async (req, res) => {
 
 exports.updateEvent = async (req, res) => {
   const { id } = req.params;
-  const { image, description } = req.body;
+  const { image, description, eventName, date, time, location } = req.body;
 
   try {
-    const event = await Event.findById(id);
+    // Find the event by id
+    let event = await Event.findById(id);
 
     if (!event) {
       return res.status(404).json({ msg: "Event not found" });
     }
 
-    // Only the creator can update the event
+    // Check if the user updating the event is the creator of the event
     if (event.createdBy.toString() !== req.user.id) {
       return res.status(401).json({ msg: "User not authorized" });
     }
 
+    // Update the event fields
     event.image = image || event.image;
     event.description = description || event.description;
+    event.eventName = eventName || event.eventName;
+    event.date = date || event.date;
+    event.time = time || event.time;
+    event.location = location || event.location;
 
     await event.save();
-    res.json({ msg: "Event updated, waiting for admin approval." });
+
+    res.json({ msg: "Event updated successfully", event });
   } catch (error) {
     console.error(error);
     res.status(500).send("Server Error");
   }
 };
-
+//delete
 exports.deleteEvent = async (req, res) => {
   const { id } = req.params;
 
