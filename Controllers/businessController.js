@@ -155,7 +155,7 @@ exports.updateBusiness = async (req, res) => {
 
 // Verify Business
 exports.approveBusiness = async (req, res) => {
-  const businessId = req.params.businessId;
+  const businessId = req.body.id;
 
   try {
     const business = await Business.findById(businessId);
@@ -175,8 +175,7 @@ exports.approveBusiness = async (req, res) => {
 };
 
 exports.verifyBusiness = async (req, res) => {
-  const businessId = req.params.Id;
-  console.log("Business ID:", businessId); // Check if businessId is correctly received
+  const businessId = req.body.id;
 
   try {
     const business = await Business.findById(businessId);

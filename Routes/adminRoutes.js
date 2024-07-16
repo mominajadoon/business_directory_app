@@ -13,10 +13,10 @@ router.post("/register-admin", registerAdmin);
 router.post("/login", loginAdmin);
 
 // Approve business modifications
-router.put("/approve-business/:id", isAuthenticated, isAdmin, approveBusiness);
+router.put("/approve-business", isAuthenticated, isAdmin, approveBusiness);
 
 // Verify business
-router.put("/verify-business/:id", isAuthenticated, isAdmin, verifyBusiness);
+router.put("/verify-business", isAuthenticated, isAdmin, verifyBusiness);
 
 // Transfer business ownership
 router.put("/transfer-ownership", isAuthenticated, isAdmin, transferOwnership);
