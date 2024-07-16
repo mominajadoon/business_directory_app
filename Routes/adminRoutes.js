@@ -22,7 +22,7 @@ router.put("/verify-business", isAuthenticated, isAdmin, verifyBusiness);
 // Approve event
 router.put("/approve-event", isAuthenticated, isAdmin, approveEvent);
 
-// Transfer business ownership
-router.put("/transfer-ownership", isAuthenticated, isAdmin, transferOwnership);
+// Route to transfer ownership of a business
+router.post("/transfer/:id", isAuthenticated, isAdmin, transferOwnership);
 
 module.exports = router;

@@ -105,52 +105,56 @@ exports.approveEvent = async (req, res) => {
   }
 };
 
+// Function to like an event
 exports.likeEvent = async (req, res) => {
-  const { id } = req.params;
+  const eventId = req.params.id;
 
   try {
-    const event = await Event.findById(id);
-
+    // Check if the event exists
+    const event = await Event.findById(eventId);
     if (!event) {
       return res.status(404).json({ msg: "Event not found" });
     }
 
-    // Check if the event is already liked by this user
+    // Check if the user has already liked the event
     if (event.likes.includes(req.user.id)) {
       return res.status(400).json({ msg: "Event already liked" });
     }
 
+    // Add user's ID to the likes array
     event.likes.push(req.user.id);
     await event.save();
 
-    res.json({ msg: "Event liked." });
+    res.json({ msg: "Event liked successfully" });
   } catch (error) {
     console.error(error);
     res.status(500).send("Server Error");
   }
 };
 
+// Function to comment on an event
 exports.commentEvent = async (req, res) => {
-  const { id } = req.params;
-  const { text } = req.body;
+  const eventId = req.params.id; // Assuming the event ID is passed in the URL parameters
+  const { text } = req.body; // Assuming the comment text is sent in the request body
 
   try {
-    const event = await Event.findById(id);
-
+    // Check if the event exists
+    const event = await Event.findById(eventId);
     if (!event) {
       return res.status(404).json({ msg: "Event not found" });
     }
 
+    // Create a new comment object
     const newComment = {
       user: req.user.id,
       text,
-      createdAt: new Date(),
     };
 
+    // Add the new comment to the comments array
     event.comments.push(newComment);
     await event.save();
 
-    res.json({ msg: "Comment added." });
+    res.json({ msg: "Comment added successfully", comment: newComment });
   } catch (error) {
     console.error(error);
     res.status(500).send("Server Error");

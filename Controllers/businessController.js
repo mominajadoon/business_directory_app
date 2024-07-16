@@ -1,5 +1,7 @@
 const Business = require("../Models/Business");
 const User = require("../Models/User");
+const multer = require("multer");
+const upload = multer({ dest: "uploads/" });
 
 exports.addBusiness = async (req, res) => {
   const {
@@ -67,9 +69,6 @@ exports.addBusiness = async (req, res) => {
     res.status(500).send("Server Error");
   }
 };
-
-const multer = require("multer");
-const upload = multer({ dest: "uploads/" });
 
 exports.updateBusiness = async (req, res) => {
   const { id } = req.params;
@@ -196,26 +195,63 @@ exports.verifyBusiness = async (req, res) => {
     return res.status(500).json({ msg: "Internal Server Error" });
   }
 };
-// Transfer Business Ownership
-exports.transferOwnership = async (req, res) => {
-  const { businessId, newOwnerId } = req.body;
+
+// Function to allow a user to claim ownership of a business
+exports.claimOwnership = async (req, res) => {
+  const { id } = req.params; // Assuming the business ID is passed in the URL parameters
 
   try {
-    const business = await Business.findById(businessId);
+    const business = await Business.findById(id);
 
     if (!business) {
       return res.status(404).json({ msg: "Business not found" });
     }
 
-    const newOwner = await User.findById(newOwnerId);
+    // Check if the business is already claimed
+    if (business.owner) {
+      return res.status(400).json({ msg: "Business is already claimed" });
+    }
+
+    // Assign current user as the owner of the business
+    business.owner = req.user.id;
+    await business.save();
+
+    res.json({ msg: "Ownership claimed successfully", business });
+  } catch (error) {
+    console.error(error);
+    res.status(500).send("Server Error");
+  }
+};
+// Transfer Business Ownership
+// Function to allow admin to transfer ownership of a business
+exports.transferOwnership = async (req, res) => {
+  const { id } = req.params; // Assuming the business ID is passed in the URL parameters
+  const { newOwnerId } = req.body; // Assuming the new owner's ID is sent in the request body
+
+  try {
+    const business = await Business.findById(id);
+
+    if (!business) {
+      return res.status(404).json({ msg: "Business not found" });
+    }
+
+    // Check if the current user is an admin (you should have isAdmin middleware)
+    if (!req.user.isAdmin) {
+      return res.status(403).json({ msg: "Access denied: Admins only" });
+    }
+
+    // Find the new owner by their ID
+    const newOwner = await User.findById(id);
 
     if (!newOwner) {
       return res.status(404).json({ msg: "New owner not found" });
     }
 
+    // Assign the new owner to the business
     business.owner = newOwnerId;
     await business.save();
-    res.json({ msg: "Business ownership transferred." });
+
+    res.json({ msg: "Ownership transferred successfully", business });
   } catch (error) {
     console.error(error);
     res.status(500).send("Server Error");
