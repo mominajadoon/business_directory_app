@@ -9,6 +9,7 @@ const connectDB = async () => {
       // useUnifiedTopology: true,
       // useCreateIndex: true,
       // useFindAndModify: false,
+      dbName: "businessApp",
     });
     console.log("MongoDB connected successfully");
   } catch (err) {

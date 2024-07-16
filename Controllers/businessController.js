@@ -4,20 +4,32 @@ const User = require("../Models/User");
 exports.addBusiness = async (req, res) => {
   const {
     name,
-    profilePicture,
-    coverPicture,
     category,
     description,
     phone,
     email,
     website,
     socialMedia,
-    gallery,
     address,
     location,
   } = req.body;
+  console.log("Authenticated User:", req.user);
+  const ownerId = req.user.id; // Assuming req.user is populated by isAuthenticated middleware
 
-  const ownerId = req.user.id; // Assuming req.user is populated by authentication middleware
+  // Check if files are uploaded
+  if (
+    !req.files ||
+    !req.files["profilePicture"] ||
+    !req.files["coverPicture"] ||
+    !req.files["gallery"]
+  ) {
+    return res.status(400).json({ msg: "All required files must be uploaded" });
+  }
+
+  // Retrieve file paths from req.files object provided by multer
+  const profilePicture = req.files["profilePicture"][0].path;
+  const coverPicture = req.files["coverPicture"][0].path;
+  const gallery = req.files["gallery"].map((file) => file.path);
 
   try {
     if (
@@ -56,6 +68,9 @@ exports.addBusiness = async (req, res) => {
   }
 };
 
+const multer = require("multer");
+const upload = multer({ dest: "uploads/" });
+
 exports.updateBusiness = async (req, res) => {
   const { id } = req.params;
   const {
@@ -67,10 +82,23 @@ exports.updateBusiness = async (req, res) => {
     website,
     socialMedia,
     address,
-    location,
   } = req.body;
 
+  let location;
+
   try {
+    // Parse the location JSON string if it exists
+    if (req.body.location) {
+      location = JSON.parse(req.body.location);
+      if (
+        !location.type ||
+        !Array.isArray(location.coordinates) ||
+        location.coordinates.length !== 2
+      ) {
+        return res.status(400).json({ msg: "Invalid location data" });
+      }
+    }
+
     const business = await Business.findById(id);
 
     if (!business) {
@@ -81,7 +109,7 @@ exports.updateBusiness = async (req, res) => {
       return res.status(401).json({ msg: "User not authorized" });
     }
 
-    // Handle file paths from `req.files` if present
+    // Handle file paths from req.files if present
     const profilePicture =
       req.files && req.files["profilePicture"]
         ? req.files["profilePicture"][0].path
@@ -125,65 +153,69 @@ exports.updateBusiness = async (req, res) => {
   }
 };
 
+// Verify Business
 exports.approveBusiness = async (req, res) => {
-  const { id } = req.params;
+  const businessId = req.params.businessId;
 
   try {
-    const business = await Business.findById(id);
+    const business = await Business.findById(businessId);
 
     if (!business) {
       return res.status(404).json({ msg: "Business not found" });
     }
 
-    if (business.pendingModifications) {
-      business.set(business.pendingModifications);
-      business.pendingModifications = {};
-    }
-
-    business.isApproved = true;
+    business.isApproved = true; // Update the field
     await business.save();
 
-    res.json({ msg: "Business approved." });
+    res.json({ msg: "Business approved successfully", business });
   } catch (error) {
-    console.error(error);
+    console.error("Error approving business:", error);
     res.status(500).send("Server Error");
   }
 };
 
 exports.verifyBusiness = async (req, res) => {
-  const { id } = req.params;
+  const businessId = req.params.Id;
+  console.log("Business ID:", businessId); // Check if businessId is correctly received
 
   try {
-    const business = await Business.findById(id);
+    const business = await Business.findById(businessId);
 
     if (!business) {
       return res.status(404).json({ msg: "Business not found" });
     }
 
+    // Your verification logic here
     business.isVerified = true;
     await business.save();
 
-    res.json({ msg: "Business verified." });
+    return res
+      .status(200)
+      .json({ msg: "Business verified successfully", business });
   } catch (error) {
-    console.error(error);
-    res.status(500).send("Server Error");
+    console.error("Error verifying business:", error);
+    return res.status(500).json({ msg: "Internal Server Error" });
   }
 };
-
-exports.claimBusiness = async (req, res) => {
-  const { id } = req.params;
-  const newOwnerId = req.user.id;
+// Transfer Business Ownership
+exports.transferOwnership = async (req, res) => {
+  const { businessId, newOwnerId } = req.body;
 
   try {
-    const business = await Business.findById(id);
+    const business = await Business.findById(businessId);
 
     if (!business) {
       return res.status(404).json({ msg: "Business not found" });
+    }
+
+    const newOwner = await User.findById(newOwnerId);
+
+    if (!newOwner) {
+      return res.status(404).json({ msg: "New owner not found" });
     }
 
     business.owner = newOwnerId;
     await business.save();
-
     res.json({ msg: "Business ownership transferred." });
   } catch (error) {
     console.error(error);

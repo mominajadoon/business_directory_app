@@ -31,10 +31,12 @@ const BusinessSchema = new mongoose.Schema(
     },
     isApproved: { type: Boolean, default: false },
     isVerified: { type: Boolean, default: false },
-    pendingModifications: {
-      type: Map,
-      of: mongoose.Schema.Types.Mixed,
-    },
+    pendingModifications: [
+      {
+        details: mongoose.Schema.Types.Mixed,
+        timestamp: { type: Date, default: Date.now },
+      },
+    ],
   },
   {
     timestamps: true,

@@ -7,13 +7,13 @@ const {
   verifyBusiness,
   claimBusiness,
 } = require("../Controllers/businessController");
-const { isAdmin, isAuthenticated } = require("../middleware/authmiddleware");
-const upload = require("../middleware/multerConfig");
+const multipleUpload = require("../middleware/multerConfig");
+const { isAuthenticated } = require("../middleware/authmiddleware");
 
-router.post("/add", isAuthenticated, upload, addBusiness);
-router.put("/update/:id", isAuthenticated, upload, updateBusiness);
-router.put("/approve/:id", isAdmin, approveBusiness);
-router.put("/verify/:id", isAdmin, verifyBusiness);
-router.put("/claim/:id", isAuthenticated, claimBusiness);
+router.post("/add", isAuthenticated, multipleUpload, addBusiness);
+router.put("/update/:id", isAuthenticated, multipleUpload, updateBusiness);
+// router.put("/approve/:id", approveBusiness);
+// router.put("/verify/:id", verifyBusiness);
+// router.put("/claim/:id", claimBusiness);
 
 module.exports = router;
