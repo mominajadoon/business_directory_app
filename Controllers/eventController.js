@@ -58,45 +58,49 @@ exports.updateEvent = async (req, res) => {
   }
 };
 //delete
+// Delete an event
+// Function to delete an event
 exports.deleteEvent = async (req, res) => {
-  const { id } = req.params;
+  const eventId = req.params.id; // Assuming the event ID is passed in the URL parameters
 
   try {
-    const event = await Event.findById(id);
-
+    // Check if the event exists
+    const event = await Event.findById(eventId);
     if (!event) {
       return res.status(404).json({ msg: "Event not found" });
     }
 
-    // Only the creator can delete the event
+    // Check if the user has permission to delete the event (if required)
     if (event.createdBy.toString() !== req.user.id) {
-      return res.status(401).json({ msg: "User not authorized" });
+      return res.status(401).json({ msg: "Unauthorized to delete this event" });
     }
 
-    await event.remove();
-    res.json({ msg: "Event removed" });
+    // Delete the event from the database using findByIdAndDelete
+    await Event.findByIdAndDelete(eventId);
+
+    res.json({ msg: "Event deleted successfully" });
   } catch (error) {
     console.error(error);
     res.status(500).send("Server Error");
   }
 };
-
+// Approved event
 exports.approveEvent = async (req, res) => {
-  const { id } = req.params;
+  const eventId = req.body.id;
 
   try {
-    const event = await Event.findById(id);
+    const event = await Event.findById(eventId);
 
     if (!event) {
-      return res.status(404).json({ msg: "Event not found" });
+      return res.status(404).json({ msg: "Business not found" });
     }
 
-    event.isApproved = true;
+    event.isApproved = true; // Update the field
     await event.save();
 
-    res.json({ msg: "Event approved." });
+    res.json({ msg: "Business approved successfully", event });
   } catch (error) {
-    console.error(error);
+    console.error("Error approving business:", error);
     res.status(500).send("Server Error");
   }
 };

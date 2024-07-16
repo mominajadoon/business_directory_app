@@ -8,11 +8,12 @@ const {
   likeEvent,
   commentEvent,
 } = require("../Controllers/eventController");
+const { isAuthenticated } = require("../middleware/authmiddleware");
 
-router.post("/add", addEvent);
-router.put("/update/:id", updateEvent);
-router.delete("/delete/:id", deleteEvent);
-router.put("/approve/:id", approveEvent);
+router.post("/add", isAuthenticated, addEvent);
+router.put("/update/:id", isAuthenticated, updateEvent);
+router.delete("/delete/:id", isAuthenticated, deleteEvent);
+// router.put("/approve/:id", approveEvent);
 router.put("/like/:id", likeEvent);
 router.post("/comment/:id", commentEvent);
 //export

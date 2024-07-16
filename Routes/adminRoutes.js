@@ -6,6 +6,7 @@ const {
   verifyBusiness,
   transferOwnership,
 } = require("../Controllers/businessController");
+const { approveEvent } = require("../Controllers/eventController");
 
 const { isAuthenticated, isAdmin } = require("../middleware/authmiddleware");
 
@@ -17,6 +18,9 @@ router.put("/approve-business", isAuthenticated, isAdmin, approveBusiness);
 
 // Verify business
 router.put("/verify-business", isAuthenticated, isAdmin, verifyBusiness);
+
+// Approve event
+router.put("/approve-event", isAuthenticated, isAdmin, approveEvent);
 
 // Transfer business ownership
 router.put("/transfer-ownership", isAuthenticated, isAdmin, transferOwnership);
