@@ -1,3 +1,4 @@
+const Events = require("../Models/Events");
 const Event = require("../Models/Events");
 
 exports.addEvent = async (req, res) => {
@@ -157,6 +158,15 @@ exports.commentEvent = async (req, res) => {
     res.json({ msg: "Comment added successfully", comment: newComment });
   } catch (error) {
     console.error(error);
+    res.status(500).send("Server Error");
+  }
+};
+exports.getAllEvents = async (req, res) => {
+  try {
+    const events = await Events.find();
+    res.json(events);
+  } catch (error) {
+    console.error("Error fetching businesses:", error);
     res.status(500).send("Server Error");
   }
 };

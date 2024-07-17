@@ -6,6 +6,7 @@ const {
   deleteEvent,
   likeEvent,
   commentEvent,
+  getAllEvents,
 } = require("../Controllers/eventController");
 const { isAuthenticated } = require("../middleware/authmiddleware");
 
@@ -17,5 +18,7 @@ router.post("/:id/like", isAuthenticated, likeEvent);
 
 // POST - Comment on an event
 router.post("/:id/comment", isAuthenticated, commentEvent);
+router.get("/all", getAllEvents);
+
 //export
 module.exports = router;
