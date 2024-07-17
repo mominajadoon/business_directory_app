@@ -166,7 +166,7 @@ exports.getAllEvents = async (req, res) => {
     const events = await Events.find();
     res.json(events);
   } catch (error) {
-    console.error("Error fetching businesses:", error);
+    console.error("Error fetching events:", error);
     res.status(500).send("Server Error");
   }
 };

@@ -7,10 +7,13 @@ const {
   resendOtp,
   newPassword,
   login,
+  getAllUsers,
 } = require("../Controllers/authController");
 
 router.post("/register", register);
 // signin
+router.get("/all", getAllUsers);
+
 router.post("/login", login);
 router.post("/verify-otp", verifyOtp);
 router.post("/resend-otp", resendOtp);

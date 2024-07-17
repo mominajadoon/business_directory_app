@@ -37,6 +37,13 @@ const BusinessSchema = new mongoose.Schema(
         timestamp: { type: Date, default: Date.now },
       },
     ],
+    keywords: { type: [String] }, // Add keywords field
+    reviews: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Review",
+      },
+    ],
   },
   {
     timestamps: true,
@@ -44,5 +51,11 @@ const BusinessSchema = new mongoose.Schema(
 );
 
 BusinessSchema.index({ location: "2dsphere" });
+BusinessSchema.index({
+  name: "text",
+  category: "text",
+  description: "text",
+  keywords: "text",
+});
 
 module.exports = mongoose.model("Business", BusinessSchema);
