@@ -257,3 +257,12 @@ exports.transferOwnership = async (req, res) => {
     res.status(500).send("Server Error");
   }
 };
+exports.getAllBusinesses = async (req, res) => {
+  try {
+    const businesses = await Business.find();
+    res.json(businesses);
+  } catch (error) {
+    console.error("Error fetching businesses:", error);
+    res.status(500).send("Server Error");
+  }
+};

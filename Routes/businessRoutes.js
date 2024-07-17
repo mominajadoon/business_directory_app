@@ -4,6 +4,7 @@ const {
   addBusiness,
   updateBusiness,
   claimOwnership,
+  getAllBusinesses,
 } = require("../Controllers/businessController");
 const multipleUpload = require("../middleware/multerConfig");
 const { isAdmin, isAuthenticated } = require("../middleware/authmiddleware");
@@ -12,5 +13,6 @@ router.post("/add", isAuthenticated, multipleUpload, addBusiness);
 router.put("/update/:id", isAuthenticated, multipleUpload, updateBusiness);
 // Route to claim ownership of a business
 router.post("/claim/:id", isAuthenticated, claimOwnership);
+router.get("/all", getAllBusinesses);
 
 module.exports = router;
