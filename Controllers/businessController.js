@@ -4,6 +4,8 @@ const multer = require("multer");
 const { Client } = require("@googlemaps/google-maps-services-js");
 const client = new Client({});
 const Review = require("../Models/Reviews");
+const Notification = require("../Models/Notifications");
+const createNotification = require("../Controllers/notificationController");
 
 const upload = multer({ dest: "uploads/" });
 
@@ -331,6 +333,7 @@ exports.getGeolocation = async (req, res) => {
 };
 
 // Function to add a review to a business
+// Example function using createNotification
 exports.addReview = async (req, res) => {
   const { businessId } = req.params;
   const { text, rating, images } = req.body;
@@ -352,19 +355,29 @@ exports.addReview = async (req, res) => {
     });
 
     await newReview.save();
+    console.log("Review saved:", newReview); // Log after saving review
 
     // Add the review to the business's reviews array
     business.reviews.push(newReview);
     await business.save();
+    console.log("Business updated with review:", business); // Log after updating business
+
+    // Trigger notification to business owner if the review is not by the owner
+    if (business.owner.toString() !== userId) {
+      await createNotification(business.owner, userId, "review", newReview._id);
+      console.log("Notification created for business owner");
+    }
+
+    console.log("Review added successfully:", newReview); // Log after successful completion
 
     res.json({ msg: "Review added successfully", review: newReview });
   } catch (error) {
-    console.error(error);
+    console.error("Error adding review:", error);
     res.status(500).send("Server Error");
   }
 };
-
 // Function to add a comment to a review
+
 exports.addComment = async (req, res) => {
   const { reviewId } = req.params;
   const { text } = req.body;
@@ -385,6 +398,11 @@ exports.addComment = async (req, res) => {
     review.comments.push(newComment);
     await review.save();
 
+    // Trigger notification to review owner if the comment is not by the review owner
+    if (review.user.toString() !== userId) {
+      await createNotification(review.user, userId, "comment", review._id);
+    }
+
     res.json({ msg: "Comment added successfully", comment: newComment });
   } catch (error) {
     console.error(error);
@@ -403,6 +421,79 @@ exports.getReviewsByBusiness = async (req, res) => {
     ); // Populate user details in the review
 
     res.json(reviews);
+  } catch (error) {
+    console.error(error);
+    res.status(500).send("Server Error");
+  }
+};
+
+// Function to add a business to user's favorites
+exports.addBusinessToFavorites = async (req, res) => {
+  const { businessId } = req.params;
+  const userId = req.user.id; // Assuming req.user is populated by isAuthenticated middleware
+
+  try {
+    // Check if the business exists
+    const business = await Business.findById(businessId);
+    if (!business) {
+      return res.status(404).json({ msg: "Business not found" });
+    }
+
+    // Check if the user exists and update their favorites
+    const user = await User.findById(userId);
+    if (!user) {
+      return res.status(404).json({ msg: "User not found" });
+    }
+
+    // Add the business to user's favorites if not already added
+    if (!user.favoriteBusinesses.includes(businessId)) {
+      user.favoriteBusinesses.push(businessId);
+      await user.save();
+    }
+
+    res.json({ msg: "Business added to favorites successfully" });
+  } catch (error) {
+    console.error(error);
+    res.status(500).send("Server Error");
+  }
+};
+
+// Function to highlight a business
+exports.highlightBusiness = async (req, res) => {
+  const { businessId } = req.params;
+
+  try {
+    const business = await Business.findById(businessId);
+
+    if (!business) {
+      return res.status(404).json({ msg: "Business not found" });
+    }
+
+    business.isHighlighted = true;
+    await business.save();
+
+    res.json({ msg: "Business highlighted successfully", business });
+  } catch (error) {
+    console.error(error);
+    res.status(500).send("Server Error");
+  }
+};
+
+// Function to unhighlight a business
+exports.unhighlightBusiness = async (req, res) => {
+  const { businessId } = req.params;
+
+  try {
+    const business = await Business.findById(businessId);
+
+    if (!business) {
+      return res.status(404).json({ msg: "Business not found" });
+    }
+
+    business.isHighlighted = false;
+    await business.save();
+
+    res.json({ msg: "Business unhighlighted successfully", business });
   } catch (error) {
     console.error(error);
     res.status(500).send("Server Error");

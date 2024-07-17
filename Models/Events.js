@@ -14,6 +14,8 @@ const EventSchema = new mongoose.Schema(
       required: true,
     },
     isApproved: { type: Boolean, default: false },
+    isHighlighted: { type: Boolean, default: false },
+
     likes: [{ type: mongoose.Schema.Types.ObjectId, ref: "User" }],
     comments: [
       {

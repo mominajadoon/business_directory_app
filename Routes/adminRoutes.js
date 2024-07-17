@@ -5,8 +5,14 @@ const {
   approveBusiness,
   verifyBusiness,
   transferOwnership,
+  highlightBusiness,
+  unhighlightBusiness,
 } = require("../Controllers/businessController");
-const { approveEvent } = require("../Controllers/eventController");
+const {
+  approveEvent,
+  highlightEvent,
+  unhighlightEvent,
+} = require("../Controllers/eventController");
 
 const { isAuthenticated, isAdmin } = require("../middleware/authmiddleware");
 
@@ -24,5 +30,30 @@ router.put("/approve-event", isAuthenticated, isAdmin, approveEvent);
 
 // Route to transfer ownership of a business
 router.post("/transfer/:id", isAuthenticated, isAdmin, transferOwnership);
+
+router.put(
+  "/highlight/:businessId",
+  isAuthenticated,
+  isAdmin,
+  highlightBusiness
+);
+router.put(
+  "/unhighlight/:businessId",
+  isAuthenticated,
+  isAdmin,
+  unhighlightBusiness
+);
+router.put(
+  "/event/highlight/:eventId",
+  isAuthenticated,
+  isAdmin,
+  highlightEvent
+);
+router.put(
+  "/event/unhighlight/:eventId",
+  isAuthenticated,
+  isAdmin,
+  unhighlightEvent
+);
 
 module.exports = router;

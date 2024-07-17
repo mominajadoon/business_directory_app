@@ -10,9 +10,14 @@ const {
   addReview,
   addComment,
   getReviewsByBusiness,
+  addBusinessToFavorites,
 } = require("../Controllers/businessController");
 const multipleUpload = require("../middleware/multerConfig");
 const { isAdmin, isAuthenticated } = require("../middleware/authmiddleware");
+const {
+  getNotifications,
+  markNotificationAsRead,
+} = require("../Controllers/notificationController");
 
 router.post("/add", isAuthenticated, multipleUpload, addBusiness);
 router.put("/update/:id", isAuthenticated, multipleUpload, updateBusiness);
@@ -25,5 +30,15 @@ router.get("/geolocation", getGeolocation);
 router.post("/:businessId/review", isAuthenticated, addReview);
 router.post("/review/:reviewId/comment", isAuthenticated, addComment);
 router.get("/:businessId/reviews", getReviewsByBusiness);
+// Route to fetch notifications for a user
+// Notification routes
+router.get("/notifications", isAuthenticated, getNotifications);
+router.put(
+  "/notifications/:notificationId/read",
+  isAuthenticated,
+  markNotificationAsRead
+);
+// Route to add a business to favorites
+router.post("/:businessId/favorite", isAuthenticated, addBusinessToFavorites);
 
 module.exports = router;

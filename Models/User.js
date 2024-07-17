@@ -7,6 +7,14 @@ const UserSchema = new mongoose.Schema({
   otp: { type: Number },
   isVerified: { type: Boolean, default: false },
   role: { type: String, default: "user" },
+  favoriteBusinesses: {
+    type: [mongoose.Schema.Types.ObjectId],
+    default: [],
+  },
+  favoriteEvents: {
+    type: [mongoose.Schema.Types.ObjectId],
+    default: [],
+  },
 });
 
 module.exports = mongoose.model("User", UserSchema);

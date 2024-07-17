@@ -7,6 +7,7 @@ const {
   likeEvent,
   commentEvent,
   getAllEvents,
+  addEventToFavorites,
 } = require("../Controllers/eventController");
 const { isAuthenticated } = require("../middleware/authmiddleware");
 
@@ -20,5 +21,7 @@ router.post("/:id/like", isAuthenticated, likeEvent);
 router.post("/:id/comment", isAuthenticated, commentEvent);
 router.get("/all", getAllEvents);
 
+// Route to add an event to favorites
+router.post("/:eventId/favorite", isAuthenticated, addEventToFavorites);
 //export
 module.exports = router;

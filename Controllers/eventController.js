@@ -1,6 +1,8 @@
 const Events = require("../Models/Events");
 const Event = require("../Models/Events");
 
+const User = require("../Models/User");
+
 exports.addEvent = async (req, res) => {
   const { image, description, eventName, date, time, location } = req.body;
   const createdBy = req.user.id;
@@ -167,6 +169,79 @@ exports.getAllEvents = async (req, res) => {
     res.json(events);
   } catch (error) {
     console.error("Error fetching events:", error);
+    res.status(500).send("Server Error");
+  }
+};
+
+// Function to add an event to user's favorites
+exports.addEventToFavorites = async (req, res) => {
+  const { eventId } = req.params;
+  const userId = req.user.id; // Assuming req.user is populated by isAuthenticated middleware
+
+  try {
+    // Check if the event exists
+    const event = await Event.findById(eventId);
+    if (!event) {
+      return res.status(404).json({ msg: "Event not found" });
+    }
+
+    // Check if the user exists and update their favorites
+    const user = await User.findById(userId);
+    if (!user) {
+      return res.status(404).json({ msg: "User not found" });
+    }
+
+    // Add the event to user's favorites if not already added
+    if (!user.favoriteEvents.includes(eventId)) {
+      user.favoriteEvents.push(eventId);
+      await user.save();
+    }
+
+    res.json({ msg: "Event added to favorites successfully" });
+  } catch (error) {
+    console.error(error);
+    res.status(500).send("Server Error");
+  }
+};
+
+// Function to highlight an event
+exports.highlightEvent = async (req, res) => {
+  const { eventId } = req.params;
+
+  try {
+    const event = await Event.findById(eventId);
+
+    if (!event) {
+      return res.status(404).json({ msg: "Event not found" });
+    }
+
+    event.isHighlighted = true;
+    await event.save();
+
+    res.json({ msg: "Event highlighted successfully", event });
+  } catch (error) {
+    console.error(error);
+    res.status(500).send("Server Error");
+  }
+};
+
+// Function to unhighlight an event
+exports.unhighlightEvent = async (req, res) => {
+  const { eventId } = req.params;
+
+  try {
+    const event = await Event.findById(eventId);
+
+    if (!event) {
+      return res.status(404).json({ msg: "Event not found" });
+    }
+
+    event.isHighlighted = false;
+    await event.save();
+
+    res.json({ msg: "Event unhighlighted successfully", event });
+  } catch (error) {
+    console.error(error);
     res.status(500).send("Server Error");
   }
 };

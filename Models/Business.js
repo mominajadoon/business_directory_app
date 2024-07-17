@@ -31,6 +31,7 @@ const BusinessSchema = new mongoose.Schema(
     },
     isApproved: { type: Boolean, default: false },
     isVerified: { type: Boolean, default: false },
+    isHighlighted: { type: Boolean, default: false },
     pendingModifications: [
       {
         details: mongoose.Schema.Types.Mixed,

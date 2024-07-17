@@ -2,6 +2,8 @@ const User = require("../Models/User");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const { sendOtpToUser, apiClient } = require("../config/nimba");
+const Business = require("../Models/Business");
+const Event = require("../Models/Events");
 
 // Register User
 exports.register = async (req, res) => {
@@ -197,6 +199,29 @@ exports.getAllUsers = async (req, res) => {
     res.json(users);
   } catch (error) {
     console.error("Error fetching users:", error);
+    res.status(500).send("Server Error");
+  }
+};
+// Function to fetch user's own businesses
+exports.getMyBusinesses = async (req, res) => {
+  try {
+    const userId = req.user.id; // Assuming user ID is in req.user
+    const businesses = await Business.find({ owner: userId });
+    res.json(businesses);
+  } catch (error) {
+    console.error("Error fetching user businesses:", error);
+    res.status(500).send("Server Error");
+  }
+};
+
+// Function to fetch user's own events
+exports.getMyEvents = async (req, res) => {
+  try {
+    const userId = req.user.id; // Assuming user ID is in req.user
+    const events = await Event.find({ createdBy: userId });
+    res.json(events);
+  } catch (error) {
+    console.error("Error fetching user events:", error);
     res.status(500).send("Server Error");
   }
 };
