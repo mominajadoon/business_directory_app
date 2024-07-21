@@ -16,11 +16,14 @@ const app = express();
 // Middleware to parse JSON requests
 app.use(express.json());
 
+// Middleware to parse URL-encoded bodies
+app.use(express.urlencoded({ extended: true }));
+
 // Routes
 app.use("/api/auth", authRoutes);
 app.use("/api/business", businessRoutes);
 app.use("/api/event", eventRoutes);
-app.use("/api/admin", adminRoutes); // Use admin routes
+app.use("/api/admin", adminRoutes);
 
 const PORT = process.env.PORT || 5000;
 

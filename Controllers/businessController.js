@@ -6,8 +6,7 @@ const client = new Client({});
 const Review = require("../Models/Reviews");
 const Notification = require("../Models/Notifications");
 const createNotification = require("../Controllers/notificationController");
-
-const upload = multer({ dest: "uploads/" });
+const upload = require("../utils/multerConfig");
 
 exports.addBusiness = async (req, res) => {
   const {
@@ -21,10 +20,9 @@ exports.addBusiness = async (req, res) => {
     address,
     location,
   } = req.body;
-  console.log("Authenticated User:", req.user);
-  const ownerId = req.user.id; // Assuming req.user is populated by isAuthenticated middleware
 
-  // Check if files are uploaded
+  const ownerId = req.user.id;
+
   if (
     !req.files ||
     !req.files["profilePicture"] ||
@@ -34,20 +32,27 @@ exports.addBusiness = async (req, res) => {
     return res.status(400).json({ msg: "All required files must be uploaded" });
   }
 
-  // Retrieve file paths from req.files object provided by multer
-  const profilePicture = req.files["profilePicture"][0].path;
-  const coverPicture = req.files["coverPicture"][0].path;
-  const gallery = req.files["gallery"].map((file) => file.path);
+  // const profilePicture = req.files["profilePicture"][0].location;
+  // const coverPicture = req.files["coverPicture"][0].location;
+  // const gallery = req.files["gallery"].map((file) => file.location);
 
+  // Files will be available in req.files
+  const profilePicture = req.files["profilePicture"]
+    ? req.files["profilePicture"][0].location
+    : null;
+  const coverPicture = req.files["coverPicture"]
+    ? req.files["coverPicture"][0].location
+    : null;
+  const gallery = req.files["gallery"]
+    ? req.files["gallery"].map((file) => file.location)
+    : [];
+  // Validate location
+  if (!location || !location.lat || !location.lng) {
+    return res
+      .status(400)
+      .json({ msg: "mapLocation with lat and lng is required" });
+  }
   try {
-    if (
-      !location ||
-      !Array.isArray(location.coordinates) ||
-      location.coordinates.length !== 2
-    ) {
-      return res.status(400).json({ msg: "Location coordinates are required" });
-    }
-
     const newBusiness = new Business({
       name,
       profilePicture,
@@ -62,12 +67,11 @@ exports.addBusiness = async (req, res) => {
       address,
       location: {
         type: "Point",
-        coordinates: location.coordinates,
+        coordinates: [parseFloat(location.lng), parseFloat(location.lat)],
       },
       owner: ownerId,
       isApproved: false,
     });
-
     await newBusiness.save();
     res.json({ msg: "Business added, waiting for admin approval." });
   } catch (error) {
@@ -114,18 +118,18 @@ exports.updateBusiness = async (req, res) => {
       return res.status(401).json({ msg: "User not authorized" });
     }
 
-    // Handle file paths from req.files if present
+    // Handle file URLs from req.files if present
     const profilePicture =
       req.files && req.files["profilePicture"]
-        ? req.files["profilePicture"][0].path
+        ? req.files["profilePicture"][0].location
         : business.profilePicture;
     const coverPicture =
       req.files && req.files["coverPicture"]
-        ? req.files["coverPicture"][0].path
+        ? req.files["coverPicture"][0].location
         : business.coverPicture;
     const gallery =
       req.files && req.files["gallery"]
-        ? req.files["gallery"].map((file) => file.path)
+        ? req.files["gallery"].map((file) => file.location)
         : business.gallery;
 
     // If files are not being uploaded, use the paths from the request body

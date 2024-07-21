@@ -15,12 +15,12 @@ const BusinessSchema = new mongoose.Schema(
     address: { type: String, required: true },
     location: {
       type: {
-        type: String,
-        enum: ["Point"],
+        type: String, // Required field specifying the type of the geometry (e.g., "Point")
+        enum: ["Point"], // Enum to enforce GeoJSON type
         required: true,
       },
       coordinates: {
-        type: [Number],
+        type: [Number], // Array of numbers for coordinates
         required: true,
       },
     },
@@ -38,7 +38,7 @@ const BusinessSchema = new mongoose.Schema(
         timestamp: { type: Date, default: Date.now },
       },
     ],
-    keywords: { type: [String] }, // Add keywords field
+    keywords: { type: [String] },
     reviews: [
       {
         type: mongoose.Schema.Types.ObjectId,

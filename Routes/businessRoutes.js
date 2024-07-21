@@ -12,15 +12,16 @@ const {
   getReviewsByBusiness,
   addBusinessToFavorites,
 } = require("../Controllers/businessController");
-const multipleUpload = require("../middleware/multerConfig");
 const { isAdmin, isAuthenticated } = require("../middleware/authmiddleware");
 const {
   getNotifications,
   markNotificationAsRead,
 } = require("../Controllers/notificationController");
 
-router.post("/add", isAuthenticated, multipleUpload, addBusiness);
-router.put("/update/:id", isAuthenticated, multipleUpload, updateBusiness);
+const upload = require("../utils/multerConfig");
+
+router.post("/add", isAuthenticated, upload, addBusiness);
+router.put("/update/:id", isAuthenticated, upload, updateBusiness);
 // Route to claim ownership of a business
 router.post("/claim/:id", isAuthenticated, claimOwnership);
 router.get("/all", getAllBusinesses);
