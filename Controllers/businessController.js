@@ -8,7 +8,80 @@ const Notification = require("../Models/Notifications");
 const createNotification = require("../Controllers/notificationController");
 const upload = require("../utils/multerConfig");
 
+// exports.addBusiness = async (req, res) => {
+//   const {
+//     name,
+//     category,
+//     description,
+//     phone,
+//     email,
+//     website,
+//     socialMedia,
+//     // address,
+//     location,
+//   } = req.body;
+
+//   const ownerId = req.user.id;
+
+//   if (
+//     !req.files ||
+//     !req.files["profilePicture"] ||
+//     !req.files["coverPicture"] ||
+//     !req.files["gallery"]
+//   ) {
+//     return res.status(400).json({ msg: "All required files must be uploaded" });
+//   }
+
+//   // const profilePicture = req.files["profilePicture"][0].location;
+//   // const coverPicture = req.files["coverPicture"][0].location;
+//   // const gallery = req.files["gallery"].map((file) => file.location);
+
+//   // Files will be available in req.files
+//   const profilePicture = req.files["profilePicture"]
+//     ? req.files["profilePicture"][0].location
+//     : null;
+//   const coverPicture = req.files["coverPicture"]
+//     ? req.files["coverPicture"][0].location
+//     : null;
+//   const gallery = req.files["gallery"]
+//     ? req.files["gallery"].map((file) => file.location)
+//     : [];
+//   // Validate location
+//   if (!location || !location.lat || !location.lng) {
+//     return res
+//       .status(400)
+//       .json({ msg: "mapLocation with lat and lng is required" });
+//   }
+//   try {
+//     const newBusiness = new Business({
+//       name,
+//       profilePicture,
+//       coverPicture,
+//       category,
+//       description,
+//       phone,
+//       email,
+//       website,
+//       socialMedia,
+//       gallery,
+//       // address,
+//       location: {
+//         type: "Point",
+//         coordinates: [parseFloat(location.lng), parseFloat(location.lat)],
+//       },
+//       owner: ownerId,
+//       isApproved: false,
+//     });
+//     await newBusiness.save();
+//     res.json({ msg: "Business added, waiting for admin approval." });
+//   } catch (error) {
+//     console.error(error);
+//     res.status(500).send("Server Error");
+//   }
+// };
 exports.addBusiness = async (req, res) => {
+  console.log(req.files); // Debugging
+
   const {
     name,
     category,
@@ -17,11 +90,8 @@ exports.addBusiness = async (req, res) => {
     email,
     website,
     socialMedia,
-    // address,
     location,
   } = req.body;
-
-  const ownerId = req.user.id;
 
   if (
     !req.files ||
@@ -32,11 +102,6 @@ exports.addBusiness = async (req, res) => {
     return res.status(400).json({ msg: "All required files must be uploaded" });
   }
 
-  // const profilePicture = req.files["profilePicture"][0].location;
-  // const coverPicture = req.files["coverPicture"][0].location;
-  // const gallery = req.files["gallery"].map((file) => file.location);
-
-  // Files will be available in req.files
   const profilePicture = req.files["profilePicture"]
     ? req.files["profilePicture"][0].location
     : null;
@@ -46,12 +111,15 @@ exports.addBusiness = async (req, res) => {
   const gallery = req.files["gallery"]
     ? req.files["gallery"].map((file) => file.location)
     : [];
-  // // Validate location
-  // if (!location || !location.lat || !location.lng) {
-  //   return res
-  //     .status(400)
-  //     .json({ msg: "mapLocation with lat and lng is required" });
-  // }
+
+  let locationData = null;
+  if (location && location.lat && location.lng) {
+    locationData = {
+      type: "Point",
+      coordinates: [parseFloat(location.lng), parseFloat(location.lat)],
+    };
+  }
+
   try {
     const newBusiness = new Business({
       name,
@@ -64,14 +132,11 @@ exports.addBusiness = async (req, res) => {
       website,
       socialMedia,
       gallery,
-      // address,
-      location: {
-        type: "Point",
-        coordinates: [parseFloat(location.lng), parseFloat(location.lat)],
-      },
-      owner: ownerId,
+      location: locationData,
+      owner: req.user.id,
       isApproved: false,
     });
+
     await newBusiness.save();
     res.json({ msg: "Business added, waiting for admin approval." });
   } catch (error) {
