@@ -46,12 +46,12 @@ exports.addBusiness = async (req, res) => {
   const gallery = req.files["gallery"]
     ? req.files["gallery"].map((file) => file.location)
     : [];
-  // Validate location
-  if (!location || !location.lat || !location.lng) {
-    return res
-      .status(400)
-      .json({ msg: "mapLocation with lat and lng is required" });
-  }
+  // // Validate location
+  // if (!location || !location.lat || !location.lng) {
+  //   return res
+  //     .status(400)
+  //     .json({ msg: "mapLocation with lat and lng is required" });
+  // }
   try {
     const newBusiness = new Business({
       name,
