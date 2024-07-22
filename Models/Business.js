@@ -12,12 +12,12 @@ const BusinessSchema = new mongoose.Schema(
     website: { type: String },
     socialMedia: { type: String },
     gallery: { type: [String] },
-    // address: { type: String, required: true },
+
     location: {
       type: {
         type: String, // Required field specifying the type of the geometry (e.g., "Point")
         enum: ["Point"], // Enum to enforce GeoJSON type
-        required: true,
+        // required: true,
       },
       coordinates: {
         type: [Number], // Array of numbers for coordinates
