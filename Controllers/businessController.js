@@ -17,7 +17,7 @@ exports.addBusiness = async (req, res) => {
     email,
     website,
     socialMedia,
-    address,
+    // address,
     location,
   } = req.body;
 
@@ -64,7 +64,7 @@ exports.addBusiness = async (req, res) => {
       website,
       socialMedia,
       gallery,
-      address,
+      // address,
       location: {
         type: "Point",
         coordinates: [parseFloat(location.lng), parseFloat(location.lat)],
