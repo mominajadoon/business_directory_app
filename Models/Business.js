@@ -12,7 +12,7 @@ const BusinessSchema = new mongoose.Schema(
     website: { type: String },
     socialMedia: { type: String },
     gallery: { type: [String] },
-    address: { type: String, required: true },
+    // address: { type: String, required: true },
     location: {
       type: {
         type: String, // Required field specifying the type of the geometry (e.g., "Point")
@@ -27,7 +27,6 @@ const BusinessSchema = new mongoose.Schema(
     owner: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "User",
-      // required: true,
     },
     isApproved: { type: Boolean, default: false },
     isVerified: { type: Boolean, default: false },
