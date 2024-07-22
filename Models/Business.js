@@ -21,7 +21,7 @@ const BusinessSchema = new mongoose.Schema(
       },
       coordinates: {
         type: [Number], // Array of numbers for coordinates
-        required: true,
+        // required: true,
       },
     },
     owner: {
