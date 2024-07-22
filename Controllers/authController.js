@@ -70,27 +70,20 @@ exports.login = async (req, res) => {
     }
 
     // Generate JWT
+    // Generate JWT without expiration
     const payload = {
       user: {
         id: user.id,
       },
     };
-    //line added
-    jwt.sign(
-      payload,
-      process.env.JWT_SECRET,
-      { expiresIn: "1h" },
-      (err, token) => {
-        if (err) throw err;
-        res.json({ token });
-      }
-    );
+
+    const token = jwt.sign(payload, process.env.JWT_SECRET);
+
+    res.json({ token });
   } catch (error) {
-    console.error(error);
-    res.status(500).send("Server Error");
+    res.status(400).json({ error: "Login failed!" });
   }
 };
-
 // Verify OTP
 exports.verifyOtp = async (req, res) => {
   const { phone, otp } = req.body;
