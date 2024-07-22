@@ -12,12 +12,11 @@ dotenv.config();
 connectDB();
 
 const app = express();
+// Middleware to parse JSON requests with increased limit
+app.use(express.json({ limit: "50mb" }));
 
-// Middleware to parse JSON requests
-app.use(express.json());
-
-// Middleware to parse URL-encoded bodies
-app.use(express.urlencoded({ extended: true }));
+// Middleware to parse URL-encoded bodies with increased limit
+app.use(express.urlencoded({ limit: "50mb", extended: true }));
 
 // Routes
 app.use("/api/auth", authRoutes);
