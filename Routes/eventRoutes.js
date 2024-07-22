@@ -1,5 +1,7 @@
 const express = require("express");
 const router = express.Router();
+const upload = require("../utils/multerConfig");
+
 const {
   addEvent,
   updateEvent,
@@ -11,8 +13,8 @@ const {
 } = require("../Controllers/eventController");
 const { isAuthenticated } = require("../middleware/authmiddleware");
 
-router.post("/add", isAuthenticated, addEvent);
-router.put("/update/:id", isAuthenticated, updateEvent);
+router.post("/add", isAuthenticated, upload, addEvent);
+router.put("/update/:id", isAuthenticated, upload, updateEvent);
 router.delete("/delete/:id", isAuthenticated, deleteEvent);
 // POST - Like an event
 router.post("/:id/like", isAuthenticated, likeEvent);

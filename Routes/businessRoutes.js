@@ -28,7 +28,7 @@ router.get("/all", getAllBusinesses);
 router.get("/search", searchBusinesses);
 router.get("/geolocation", getGeolocation);
 // Review routes
-router.post("/:businessId/review", isAuthenticated, addReview);
+router.post("/:businessId/review", isAuthenticated, upload, addReview);
 router.post("/review/:reviewId/comment", isAuthenticated, addComment);
 router.get("/:businessId/reviews", getReviewsByBusiness);
 // Route to fetch notifications for a user
