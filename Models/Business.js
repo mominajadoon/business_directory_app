@@ -27,7 +27,7 @@ const BusinessSchema = new mongoose.Schema(
     owner: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "User",
-      required: true,
+      // required: true,
     },
     isApproved: { type: Boolean, default: false },
     isVerified: { type: Boolean, default: false },
