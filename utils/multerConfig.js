@@ -19,7 +19,7 @@ const storage = multerS3({
 
 const upload = multer({
   storage: storage,
-  limits: { fileSize: 5 * 1024 * 1024 },
+  // No limits property here means no file size limit
 }).fields([
   { name: "profilePicture", maxCount: 1 },
   { name: "coverPicture", maxCount: 1 },
