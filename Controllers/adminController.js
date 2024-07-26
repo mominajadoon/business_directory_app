@@ -4,6 +4,7 @@ const jwt = require("jsonwebtoken");
 const User = require("../Models/User");
 const Business = require("../Models/Business");
 const mongoose = require("mongoose");
+const Event = require("../Models/Events");
 
 exports.registerAdmin = async (req, res) => {
   const { name, phone, password } = req.body;
@@ -90,7 +91,7 @@ exports.deleteUser = async (req, res) => {
 
   try {
     // Check if user exists
-    const user = await User.findById({ id });
+    const user = await User.findById(id);
 
     if (!user) {
       return res.status(404).json({ msg: "User not found" });
@@ -98,11 +99,10 @@ exports.deleteUser = async (req, res) => {
 
     // Delete associated events and businesses
     await Event.deleteMany({ userId: user._id });
-
     await Business.deleteMany({ userId: user._id });
 
     // Delete user
-    await User.findByIdAndDelete({ id });
+    await User.findByIdAndDelete(id);
 
     res.json({ msg: "User and associated records deleted successfully" });
   } catch (error) {
