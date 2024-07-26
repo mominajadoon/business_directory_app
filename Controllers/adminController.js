@@ -49,8 +49,9 @@ exports.loginAdmin = async (req, res) => {
 
     // Check if user exists
     const admin = await Admin.findOne({ phone });
+
     if (!admin) {
-      return res.status(400).json({ msg: "Invalid credentials" });
+      return res.status(400).json({ msg: "Admin Not Found!" });
     }
 
     // Check if password matches
@@ -63,7 +64,7 @@ exports.loginAdmin = async (req, res) => {
     const payload = {
       user: {
         id: admin.id,
-        role: "admin", // Include role in the payload
+        role: admin.role,
       },
     };
 
@@ -73,7 +74,7 @@ exports.loginAdmin = async (req, res) => {
       // Remove expiresIn to not set expiration time
       (err, token) => {
         if (err) throw err;
-        res.status(200).json({ token, role: "admin" }); // Include role in the response
+        res.status(200).json({ token, user: payload.user });
       }
     );
   } catch (error) {
@@ -82,23 +83,29 @@ exports.loginAdmin = async (req, res) => {
   }
 };
 
-// Delete User
+// delete User
 exports.deleteUser = async (req, res) => {
-  const { phone } = req.body;
+  const { id } = req.body;
 
   try {
     // Check if user exists
-    const user = await User.findOne({ phone });
+    const user = await User.findById({ id });
+
     if (!user) {
       return res.status(404).json({ msg: "User not found" });
     }
 
-    // Delete user
-    await User.deleteOne({ phone });
+    // Delete associated events and businesses
+    await Event.deleteMany({ userId: user._id });
 
-    res.json({ msg: "User deleted successfully" });
+    await Business.deleteMany({ userId: user._id });
+
+    // Delete user
+    await User.findByIdAndDelete({ id });
+
+    res.json({ msg: "User and associated records deleted successfully" });
   } catch (error) {
-    console.error("Error deleting user:", error);
+    console.error("Error deleting user and associated records:", error);
     res.status(500).send("Server Error");
   }
 };
