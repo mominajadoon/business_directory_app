@@ -111,49 +111,49 @@ exports.deleteUser = async (req, res) => {
   }
 };
 
-// Function for admin to edit a business
-exports.adminEditBusiness = async (req, res) => {
-  const { id } = req.params;
+// // Function for admin to edit a business
+// exports.adminEditBusiness = async (req, res) => {
+//   const { id } = req.params;
 
-  const updates = req.body;
+//   const updates = req.body;
 
-  console.log("Request Body:", req.body);
+//   console.log("Request Body:", req.body);
 
-  try {
-    // Find the business
-    const business = await Business.findById(id);
+//   try {
+//     // Find the business
+//     const business = await Business.findById(id);
 
-    // Log before saving
-    console.log("Before Save:", business);
+//     // Log before saving
+//     console.log("Before Save:", business);
 
-    if (!business) {
-      return res.status(404).json({ msg: "Business not found" });
-    }
+//     if (!business) {
+//       return res.status(404).json({ msg: "Business not found" });
+//     }
 
-    // Apply updates
-    Object.keys(updates).forEach((key) => {
-      if (updates[key] !== undefined) {
-        business[key] = updates[key];
-      }
-    });
+//     // Apply updates
+//     Object.keys(updates).forEach((key) => {
+//       if (updates[key] !== undefined) {
+//         business[key] = updates[key];
+//       }
+//     });
 
-    const updatedBuiness = await Business.findByIdAndUpdate({
-      //
-    });
+//     const updatedBuiness = await Business.findByIdAndUpdate({
+//       //
+//     });
 
-    // Save the business
-    await updatedBuiness.save();
+//     // Save the business
+//     await updatedBuiness.save();
 
-    // Log after saving
-    console.log("After Save:", business);
+//     // Log after saving
+//     console.log("After Save:", business);
 
-    // Respond with the updated business
-    res.json({ msg: "Business updated successfully", business });
-  } catch (error) {
-    console.error("Error updating business:", error);
-    res.status(500).send("Server Error");
-  }
-};
+//     // Respond with the updated business
+//     res.json({ msg: "Business updated successfully", business });
+//   } catch (error) {
+//     console.error("Error updating business:", error);
+//     res.status(500).send("Server Error");
+//   }
+// };
 
 // for superAdmin  to get all admins
 
@@ -235,7 +235,7 @@ exports.blockUser = async (req, res) => {
 };
 
 exports.EditBusiness = async (req, res) => {
-  const businessId = req.params.id; // Get business ID from URL parameters
+  const { id: businessId } = req.body; // Get business ID from the request body
 
   console.log(req.files); // Debugging
 
@@ -295,7 +295,9 @@ exports.EditBusiness = async (req, res) => {
         ],
       };
     }
-    business.isApproved = false;
+
+    // Set isApproved to false after update
+    business.isApproved = true;
 
     // Save the updated business
     await business.save();

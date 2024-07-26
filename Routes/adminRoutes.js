@@ -4,7 +4,7 @@ const {
   registerAdmin,
   loginAdmin,
   deleteUser,
-  adminEditBusiness,
+  // adminEditBusiness,
   getAllAdmins,
   deleteAdmin,
   blockAdmin,
@@ -73,15 +73,15 @@ router.put(
 );
 
 // Delete user
-router.delete("/delete-user", isAuthenticated, isAdmin, deleteUser);
+router.delete("/delete-user", isAuthenticated, isAdminOrSuperAdmin, deleteUser);
 // Route to edit a business by admin
-router.put("/edit-business/:id", isAuthenticated, isAdmin, adminEditBusiness);
+// router.put("/edit-business/:id", isAuthenticated, isAdmin, adminEditBusiness);
 router.get("/all-admins", isAuthenticated, isSuperAdmin, getAllAdmins);
 router.delete("/delete-admin", isAuthenticated, isSuperAdmin, deleteAdmin);
 router.put("/block-admin", isAuthenticated, isSuperAdmin, blockAdmin);
 router.put("/block-user", isAuthenticated, isAdminOrSuperAdmin, blockUser);
 router.put(
-  "/update/:id",
+  "/update",
   isAuthenticated,
   isAdminOrSuperAdmin,
   upload,
