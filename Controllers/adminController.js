@@ -115,11 +115,15 @@ exports.adminEditBusiness = async (req, res) => {
   const { id } = req.params;
 
   const updates = req.body;
+
   console.log("Request Body:", req.body);
 
   try {
     // Find the business
     const business = await Business.findById(id);
+
+    // Log before saving
+    console.log("Before Save:", business);
 
     if (!business) {
       return res.status(404).json({ msg: "Business not found" });
@@ -132,11 +136,12 @@ exports.adminEditBusiness = async (req, res) => {
       }
     });
 
-    // Log before saving
-    console.log("Before Save:", business);
+    const updatedBuiness = await Business.findByIdAndUpdate({
+      //
+    });
 
     // Save the business
-    await business.save();
+    await updatedBuiness.save();
 
     // Log after saving
     console.log("After Save:", business);
@@ -145,6 +150,18 @@ exports.adminEditBusiness = async (req, res) => {
     res.json({ msg: "Business updated successfully", business });
   } catch (error) {
     console.error("Error updating business:", error);
+    res.status(500).send("Server Error");
+  }
+};
+
+// for superAdmin  to get all admins
+
+exports.getAllAdmins = async (req, res) => {
+  try {
+    const admins = await Admin.find();
+    res.json(admins);
+  } catch (error) {
+    console.error(error);
     res.status(500).send("Server Error");
   }
 };
