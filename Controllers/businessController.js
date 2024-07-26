@@ -249,7 +249,7 @@ exports.approveBusiness = async (req, res) => {
       return res.status(404).json({ msg: "Business not found" });
     }
 
-    business.isApproved = true; // Update the field
+    business.isApproved = !business.isApproved;
     await business.save();
 
     res.json({ msg: "Business approved successfully", business });

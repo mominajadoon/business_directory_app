@@ -168,34 +168,41 @@ exports.getAllAdmins = async (req, res) => {
 
 // delete admin by super admin
 exports.deleteAdmin = async (req, res) => {
+  const { id } = req.body; // Get ID from request body
+
   try {
-    const admin = await Admin.findById(req.params.id);
+    const admin = await Admin.findById(id);
 
     if (!admin) {
       return res.status(404).json({ msg: "Admin not found" });
     }
 
-    await Admin.findByIdAndDelete(req.params.id);
+    await Admin.findByIdAndDelete(id);
     res.json({ msg: "Admin deleted successfully" });
   } catch (error) {
     console.error(error);
     res.status(500).send("Server Error");
   }
 };
-
-// block admins by super admin
+// Block or unblock admins by super admin
 exports.blockAdmin = async (req, res) => {
+  const { id } = req.body;
+
   try {
-    const admin = await Admin.findById(req.params.id);
+    const admin = await Admin.findById(id);
 
     if (!admin) {
       return res.status(404).json({ msg: "Admin not found" });
     }
 
-    admin.block = true;
+    // Toggle the block field
+    admin.block = !admin.block;
     await admin.save();
 
-    res.json({ msg: "Admin blocked successfully" });
+    res.json({
+      msg: `Admin block status set to ${admin.block ? "blocked" : "unblocked"}`,
+      admin,
+    });
   } catch (error) {
     console.error(error);
     res.status(500).send("Server Error");
