@@ -154,7 +154,10 @@ exports.addBusiness = async (req, res) => {
 };
 
 exports.updateBusiness = async (req, res) => {
-  const { id } = req.params;
+  const businessId = req.params.id; // Get business ID from URL parameters
+
+  console.log(req.files); // Debugging
+
   const {
     name,
     category,
@@ -163,75 +166,58 @@ exports.updateBusiness = async (req, res) => {
     email,
     website,
     socialMedia,
-    address,
+    location,
   } = req.body;
 
-  let location;
-
   try {
-    // Parse the location JSON string if it exists
-    if (req.body.location) {
-      location = JSON.parse(req.body.location);
-      if (
-        !location.type ||
-        !Array.isArray(location.coordinates) ||
-        location.coordinates.length !== 2
-      ) {
-        return res.status(400).json({ msg: "Invalid location data" });
-      }
-    }
-
-    const business = await Business.findById(id);
+    // Find the existing business
+    const business = await Business.findById(businessId);
 
     if (!business) {
       return res.status(404).json({ msg: "Business not found" });
     }
 
-    if (
-      business.owner.toString() !== req.user.id ||
-      req.user.role !== "admin"
-    ) {
-      return res.status(401).json({ msg: "User not authorized" });
+    // Update business details
+    business.name = name || business.name;
+    business.category = category || business.category;
+    business.description = description || business.description;
+    business.phone = phone || business.phone;
+    business.email = email || business.email;
+    business.website = website || business.website;
+    business.socialMedia = socialMedia || business.socialMedia;
+
+    // Process file uploads if provided
+    if (req.files) {
+      if (req.files["profilePicture"]) {
+        business.profilePicture = req.files["profilePicture"][0].location;
+      }
+      if (req.files["coverPicture"]) {
+        business.coverPicture = req.files["coverPicture"][0].location;
+      }
+      if (req.files["gallery"]) {
+        business.gallery = req.files["gallery"].map((file) => file.location);
+      }
     }
 
-    // Handle file URLs from req.files if present
-    const profilePicture =
-      req.files && req.files["profilePicture"]
-        ? req.files["profilePicture"][0].location
-        : business.profilePicture;
-    const coverPicture =
-      req.files && req.files["coverPicture"]
-        ? req.files["coverPicture"][0].location
-        : business.coverPicture;
-    const gallery =
-      req.files && req.files["gallery"]
-        ? req.files["gallery"].map((file) => file.location)
-        : business.gallery;
+    // Update location if provided
+    if (
+      location &&
+      location.type === "Point" &&
+      location.coordinates &&
+      location.coordinates.length === 2
+    ) {
+      business.location = {
+        type: "Point",
+        coordinates: [
+          parseFloat(location.coordinates[0]),
+          parseFloat(location.coordinates[1]),
+        ],
+      };
+    }
 
-    // If files are not being uploaded, use the paths from the request body
-    const profilePicturePath =
-      profilePicture || req.body.profilePicture || business.profilePicture;
-    const coverPicturePath =
-      coverPicture || req.body.coverPicture || business.coverPicture;
-    const galleryPaths =
-      gallery.length > 0 ? gallery : req.body.gallery || business.gallery;
-
-    // Apply the updates directly to the business document
-    if (name) business.name = name;
-    if (profilePicturePath) business.profilePicture = profilePicturePath;
-    if (coverPicturePath) business.coverPicture = coverPicturePath;
-    if (category) business.category = category;
-    if (description) business.description = description;
-    if (phone) business.phone = phone;
-    if (email) business.email = email;
-    if (website) business.website = website;
-    if (socialMedia) business.socialMedia = socialMedia;
-    if (galleryPaths) business.gallery = galleryPaths;
-    if (address) business.address = address;
-    if (location) business.location = location;
-
+    // Save the updated business
     await business.save();
-    res.json({ msg: "Business updated successfully." });
+    res.json({ msg: "Business updated successfully", business });
   } catch (error) {
     console.error(error);
     res.status(500).send("Server Error");

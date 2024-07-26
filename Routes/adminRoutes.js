@@ -30,7 +30,7 @@ const {
   isAdminOrSuperAdmin,
 } = require("../middleware/authmiddleware");
 
-router.post("/register-admin", isSuperAdmin, registerAdmin);
+router.post("/register-admin", isAuthenticated, isSuperAdmin, registerAdmin);
 router.post("/login", loginAdmin);
 
 // Approve business modifications
