@@ -235,9 +235,9 @@ exports.blockUser = async (req, res) => {
 };
 
 exports.EditBusiness = async (req, res) => {
-  const { id: businessId } = req.body; // Get business ID from the request body
+  const { id: businessId } = req.body;
 
-  console.log(req.files); // Debugging
+  // console.log(req.files);
 
   const {
     name,
@@ -302,6 +302,46 @@ exports.EditBusiness = async (req, res) => {
     // Save the updated business
     await business.save();
     res.json({ msg: "Business updated successfully", business });
+  } catch (error) {
+    console.error(error);
+    res.status(500).send("Server Error");
+  }
+};
+
+exports.deleteBusiness = async (req, res) => {
+  const { id: businessId } = req.body;
+
+  try {
+    // Find the business by ID
+    const business = await Business.findById(businessId);
+
+    if (!business) {
+      return res.status(404).json({ msg: "Business not found" });
+    }
+
+    // Delete the business
+    await Business.deleteOne({ _id: businessId });
+    res.json({ msg: "Business deleted successfully" });
+  } catch (error) {
+    console.error(error);
+    res.status(500).send("Server Error");
+  }
+};
+
+exports.deleteEvent = async (req, res) => {
+  const { id: eventId } = req.body; // Get event ID from the request body
+
+  try {
+    // Find the event by ID
+    const event = await Event.findById(eventId);
+
+    if (!event) {
+      return res.status(404).json({ msg: "Event not found" });
+    }
+
+    // Delete the event
+    await Event.deleteOne({ _id: eventId });
+    res.json({ msg: "Event deleted successfully" });
   } catch (error) {
     console.error(error);
     res.status(500).send("Server Error");

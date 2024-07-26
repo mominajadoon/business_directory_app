@@ -10,6 +10,8 @@ const {
   blockAdmin,
   blockUser,
   EditBusiness,
+  deleteEvent,
+  deleteBusiness,
 } = require("../Controllers/adminController");
 const {
   approveBusiness,
@@ -79,6 +81,19 @@ router.delete("/delete-user", isAuthenticated, isAdminOrSuperAdmin, deleteUser);
 router.get("/all-admins", isAuthenticated, isSuperAdmin, getAllAdmins);
 router.delete("/delete-admin", isAuthenticated, isSuperAdmin, deleteAdmin);
 router.put("/block-admin", isAuthenticated, isSuperAdmin, blockAdmin);
+router.delete(
+  "/business/delete",
+  isAuthenticated,
+  isAdminOrSuperAdmin,
+  deleteBusiness
+);
+router.delete(
+  "/event/delete",
+  isAuthenticated,
+  isAdminOrSuperAdmin,
+  deleteEvent
+);
+
 router.put("/block-user", isAuthenticated, isAdminOrSuperAdmin, blockUser);
 router.put(
   "/update",
