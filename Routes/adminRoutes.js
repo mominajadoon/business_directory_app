@@ -9,6 +9,7 @@ const {
   deleteAdmin,
   blockAdmin,
   blockUser,
+  EditBusiness,
 } = require("../Controllers/adminController");
 const {
   approveBusiness,
@@ -29,6 +30,7 @@ const {
   isAdmin,
   isAdminOrSuperAdmin,
 } = require("../middleware/authmiddleware");
+const upload = require("../utils/multerConfig");
 
 router.post("/register-admin", isAuthenticated, isSuperAdmin, registerAdmin);
 router.post("/login", loginAdmin);
@@ -78,4 +80,12 @@ router.get("/all-admins", isAuthenticated, isSuperAdmin, getAllAdmins);
 router.delete("/delete-admin", isAuthenticated, isSuperAdmin, deleteAdmin);
 router.put("/block-admin", isAuthenticated, isSuperAdmin, blockAdmin);
 router.put("/block-user", isAuthenticated, isAdminOrSuperAdmin, blockUser);
+router.put(
+  "/update/:id",
+  isAuthenticated,
+  isAdminOrSuperAdmin,
+  upload,
+  EditBusiness
+);
+
 module.exports = router;

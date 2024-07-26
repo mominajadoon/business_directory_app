@@ -233,3 +233,75 @@ exports.blockUser = async (req, res) => {
     res.status(500).send("Server Error");
   }
 };
+
+exports.EditBusiness = async (req, res) => {
+  const businessId = req.params.id; // Get business ID from URL parameters
+
+  console.log(req.files); // Debugging
+
+  const {
+    name,
+    category,
+    description,
+    phone,
+    email,
+    website,
+    socialMedia,
+    location,
+  } = req.body;
+
+  try {
+    // Find the existing business
+    const business = await Business.findById(businessId);
+
+    if (!business) {
+      return res.status(404).json({ msg: "Business not found" });
+    }
+
+    // Update business details
+    business.name = name || business.name;
+    business.category = category || business.category;
+    business.description = description || business.description;
+    business.phone = phone || business.phone;
+    business.email = email || business.email;
+    business.website = website || business.website;
+    business.socialMedia = socialMedia || business.socialMedia;
+
+    // Process file uploads if provided
+    if (req.files) {
+      if (req.files["profilePicture"]) {
+        business.profilePicture = req.files["profilePicture"][0].location;
+      }
+      if (req.files["coverPicture"]) {
+        business.coverPicture = req.files["coverPicture"][0].location;
+      }
+      if (req.files["gallery"]) {
+        business.gallery = req.files["gallery"].map((file) => file.location);
+      }
+    }
+
+    // Update location if provided
+    if (
+      location &&
+      location.type === "Point" &&
+      location.coordinates &&
+      location.coordinates.length === 2
+    ) {
+      business.location = {
+        type: "Point",
+        coordinates: [
+          parseFloat(location.coordinates[0]),
+          parseFloat(location.coordinates[1]),
+        ],
+      };
+    }
+    business.isApproved = false;
+
+    // Save the updated business
+    await business.save();
+    res.json({ msg: "Business updated successfully", business });
+  } catch (error) {
+    console.error(error);
+    res.status(500).send("Server Error");
+  }
+};

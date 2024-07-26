@@ -214,6 +214,7 @@ exports.updateBusiness = async (req, res) => {
         ],
       };
     }
+    business.isApproved = false;
 
     // Save the updated business
     await business.save();
