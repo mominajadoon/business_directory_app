@@ -347,3 +347,26 @@ exports.deleteEvent = async (req, res) => {
     res.status(500).send("Server Error");
   }
 };
+
+exports.verifyEvent = async (req, res) => {
+  const { id: eventId } = req.body;
+
+  try {
+    // Find the event by ID
+    const event = await Event.findById(eventId);
+
+    if (!event) {
+      return res.status(404).json({ msg: "Event not found" });
+    }
+
+    // Verify the event
+    event.isApproved = true;
+
+    // Save the updated event
+    await event.save();
+    res.json({ msg: "Event verified successfully", event });
+  } catch (error) {
+    console.error(error);
+    res.status(500).send("Server Error");
+  }
+};

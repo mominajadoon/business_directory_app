@@ -12,6 +12,7 @@ const {
   EditBusiness,
   deleteEvent,
   deleteBusiness,
+  verifyEvent,
 } = require("../Controllers/adminController");
 const {
   approveBusiness,
@@ -38,16 +39,36 @@ router.post("/register-admin", isAuthenticated, isSuperAdmin, registerAdmin);
 router.post("/login", loginAdmin);
 
 // Approve business modifications
-router.put("/approve-business", isAuthenticated, isAdmin, approveBusiness);
+router.put(
+  "/approve-business",
+  isAuthenticated,
+  isAdminOrSuperAdmin,
+  approveBusiness
+);
 
 // Verify business
-router.put("/verify-business", isAuthenticated, isAdmin, verifyBusiness);
+router.put(
+  "/verify-business",
+  isAuthenticated,
+  isAdminOrSuperAdmin,
+  verifyBusiness
+);
 
 // Approve event
-router.put("/approve-event", isAuthenticated, isAdmin, approveEvent);
+router.put(
+  "/approve-event",
+  isAuthenticated,
+  isAdminOrSuperAdmin,
+  approveEvent
+);
 
 // Route to transfer ownership of a business
-router.post("/transfer/:id", isAuthenticated, isAdmin, transferOwnership);
+router.post(
+  "/transfer/:id",
+  isAuthenticated,
+  isAdminOrSuperAdmin,
+  transferOwnership
+);
 
 router.put(
   "/highlight/:businessId",
@@ -80,6 +101,7 @@ router.delete("/delete-user", isAuthenticated, isAdminOrSuperAdmin, deleteUser);
 // router.put("/edit-business/:id", isAuthenticated, isAdmin, adminEditBusiness);
 router.get("/all-admins", isAuthenticated, isSuperAdmin, getAllAdmins);
 router.delete("/delete-admin", isAuthenticated, isSuperAdmin, deleteAdmin);
+router.put("/event/verify", isAuthenticated, isAdminOrSuperAdmin, verifyEvent);
 router.put("/block-admin", isAuthenticated, isSuperAdmin, blockAdmin);
 router.delete(
   "/business/delete",

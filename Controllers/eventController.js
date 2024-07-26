@@ -4,14 +4,14 @@ const Event = require("../Models/Events");
 const User = require("../Models/User");
 
 exports.addEvent = async (req, res) => {
-  const { image, description, eventName, date, time, location } = req.body;
+  const { image, description, name, date, time, location } = req.body;
   const createdBy = req.user.id;
 
   try {
     const newEvent = new Event({
       image,
       description,
-      eventName,
+      name,
       date,
       time,
       location,
@@ -29,7 +29,7 @@ exports.addEvent = async (req, res) => {
 
 exports.updateEvent = async (req, res) => {
   const { id } = req.params;
-  const { image, description, eventName, date, time, location } = req.body;
+  const { image, description, name, date, time, location } = req.body;
 
   try {
     // Find the event by id
@@ -47,7 +47,7 @@ exports.updateEvent = async (req, res) => {
     // Update the event fields
     event.image = image || event.image;
     event.description = description || event.description;
-    event.eventName = eventName || event.eventName;
+    event.name = name || event.name;
     event.date = date || event.date;
     event.time = time || event.time;
     event.location = location || event.location;
