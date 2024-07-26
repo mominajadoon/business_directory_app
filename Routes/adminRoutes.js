@@ -1,6 +1,11 @@
 const express = require("express");
 const router = express.Router();
-const { registerAdmin, loginAdmin } = require("../Controllers/adminController");
+const {
+  registerAdmin,
+  loginAdmin,
+  deleteUser,
+  adminEditBusiness,
+} = require("../Controllers/adminController");
 const {
   approveBusiness,
   verifyBusiness,
@@ -59,5 +64,10 @@ router.put(
   isAdmin,
   unhighlightEvent
 );
+
+// Delete user
+router.delete("/delete-user", isAuthenticated, isAdmin, deleteUser);
+// Route to edit a business by admin
+router.put("/edit-business/:id", isAuthenticated, isAdmin, adminEditBusiness);
 
 module.exports = router;

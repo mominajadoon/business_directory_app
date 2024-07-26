@@ -74,14 +74,24 @@ exports.login = async (req, res) => {
     const payload = {
       user: {
         id: user.id,
+        role: user.role,
       },
     };
 
     const token = jwt.sign(payload, process.env.JWT_SECRET);
 
-    res.json({ token });
+    res.status(200).json({
+      token,
+      user: {
+        id: user.id,
+        role: user.role,
+      },
+      status: 200,
+      msg: "Login successful",
+    });
   } catch (error) {
-    res.status(400).json({ error: "Login failed!" });
+    console.error("Login Error:", error);
+    res.status(500).json({ error: "Login failed!" });
   }
 };
 // Verify OTP

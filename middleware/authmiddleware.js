@@ -41,6 +41,8 @@ exports.isSuperAdmin = (req, res, next) => {
 
 exports.isAdmin = (req, res, next) => {
   if (!req.user || req.user.role !== "admin") {
+    console.log("Checking Admin Role:", req.user); // Added debug log
+
     return res.status(403).json({ msg: "Access denied: Admins only" });
   }
   next();
