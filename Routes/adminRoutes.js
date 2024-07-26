@@ -8,6 +8,7 @@ const {
   getAllAdmins,
   deleteAdmin,
   blockAdmin,
+  blockUser,
 } = require("../Controllers/adminController");
 const {
   approveBusiness,
@@ -26,6 +27,7 @@ const {
   isAuthenticated,
   isSuperAdmin,
   isAdmin,
+  isAdminOrSuperAdmin,
 } = require("../middleware/authmiddleware");
 
 router.post("/register-admin", isSuperAdmin, registerAdmin);
@@ -75,4 +77,5 @@ router.put("/edit-business/:id", isAuthenticated, isAdmin, adminEditBusiness);
 router.get("/all-admins", isAuthenticated, isSuperAdmin, getAllAdmins);
 router.delete("/delete-admin", isAuthenticated, isSuperAdmin, deleteAdmin);
 router.put("/block-admin", isAuthenticated, isSuperAdmin, blockAdmin);
+router.put("/block-user", isAuthenticated, isAdminOrSuperAdmin, blockUser);
 module.exports = router;

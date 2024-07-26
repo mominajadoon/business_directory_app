@@ -3,6 +3,7 @@ const Admin = require("../Models/Admin");
 const jwt = require("jsonwebtoken");
 const User = require("../Models/User");
 const Business = require("../Models/Business");
+const mongoose = require("mongoose");
 
 exports.registerAdmin = async (req, res) => {
   const { name, phone, password } = req.body;
@@ -202,6 +203,30 @@ exports.blockAdmin = async (req, res) => {
     res.json({
       msg: `Admin block status set to ${admin.block ? "blocked" : "unblocked"}`,
       admin,
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(500).send("Server Error");
+  }
+};
+
+exports.blockUser = async (req, res) => {
+  const { id } = req.body; // Get ID from request body
+
+  try {
+    const user = await User.findById(id);
+
+    if (!user) {
+      return res.status(404).json({ msg: "User not found" });
+    }
+
+    // Toggle the block field
+    user.block = !user.block;
+    await user.save();
+
+    res.json({
+      msg: `User block status set to ${user.block ? "blocked" : "unblocked"}`,
+      user,
     });
   } catch (error) {
     console.error(error);

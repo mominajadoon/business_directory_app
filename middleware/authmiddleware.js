@@ -47,3 +47,14 @@ exports.isAdmin = (req, res, next) => {
   }
   next();
 };
+exports.isAdminOrSuperAdmin = (req, res, next) => {
+  if (
+    !req.user ||
+    (req.user.role !== "admin" && req.user.role !== "superAdmin")
+  ) {
+    return res
+      .status(403)
+      .json({ msg: "Access denied: Admins and Super Admins only" });
+  }
+  next();
+};
