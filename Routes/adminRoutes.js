@@ -6,6 +6,8 @@ const {
   deleteUser,
   adminEditBusiness,
   getAllAdmins,
+  deleteAdmin,
+  blockAdmin,
 } = require("../Controllers/adminController");
 const {
   approveBusiness,
@@ -71,5 +73,6 @@ router.delete("/delete-user", isAuthenticated, isAdmin, deleteUser);
 // Route to edit a business by admin
 router.put("/edit-business/:id", isAuthenticated, isAdmin, adminEditBusiness);
 router.get("/all-admins", isAuthenticated, isSuperAdmin, getAllAdmins);
-
+router.delete("/:id", isAuthenticated, isSuperAdmin, deleteAdmin);
+router.put("/block/:id", isAuthenticated, isSuperAdmin, blockAdmin);
 module.exports = router;

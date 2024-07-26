@@ -165,3 +165,39 @@ exports.getAllAdmins = async (req, res) => {
     res.status(500).send("Server Error");
   }
 };
+
+// delete admin by super admin
+exports.deleteAdmin = async (req, res) => {
+  try {
+    const admin = await Admin.findById(req.params.id);
+
+    if (!admin) {
+      return res.status(404).json({ msg: "Admin not found" });
+    }
+
+    await Admin.findByIdAndDelete(req.params.id);
+    res.json({ msg: "Admin deleted successfully" });
+  } catch (error) {
+    console.error(error);
+    res.status(500).send("Server Error");
+  }
+};
+
+// block admins by super admin
+exports.blockAdmin = async (req, res) => {
+  try {
+    const admin = await Admin.findById(req.params.id);
+
+    if (!admin) {
+      return res.status(404).json({ msg: "Admin not found" });
+    }
+
+    admin.block = true;
+    await admin.save();
+
+    res.json({ msg: "Admin blocked successfully" });
+  } catch (error) {
+    console.error(error);
+    res.status(500).send("Server Error");
+  }
+};
