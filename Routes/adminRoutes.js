@@ -14,9 +14,13 @@ const {
   unhighlightEvent,
 } = require("../Controllers/eventController");
 
-const { isAuthenticated, isAdmin } = require("../middleware/authmiddleware");
+const {
+  isAuthenticated,
+  isSuperAdmin,
+  isAdmin,
+} = require("../middleware/authmiddleware");
 
-router.post("/register-admin", registerAdmin);
+router.post("/register-admin", isSuperAdmin, registerAdmin);
 router.post("/login", loginAdmin);
 
 // Approve business modifications

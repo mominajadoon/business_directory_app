@@ -1,10 +1,9 @@
 const bcrypt = require("bcryptjs");
 const Admin = require("../Models/Admin");
 const jwt = require("jsonwebtoken");
-const { sendOtpToUser } = require("../config/nimba"); // Adjust the path as per your project structure
 
 exports.registerAdmin = async (req, res) => {
-  const { name, phone, password, role } = req.body;
+  const { name, phone, password } = req.body;
 
   try {
     // Validate input fields
@@ -14,13 +13,13 @@ exports.registerAdmin = async (req, res) => {
 
     // Check if admin already exists
     let admin = await Admin.findOne({ phone });
+
     if (admin) {
       return res.status(400).json({ msg: "Admin already exists" });
     }
 
     // Create new admin instance with null otp field
-    let otp = null;
-    admin = new Admin({ name, phone, password, role, otp });
+    admin = new Admin({ name, phone, password, role: "admin" });
 
     // Hash password
     const salt = await bcrypt.genSalt(10);
@@ -29,14 +28,7 @@ exports.registerAdmin = async (req, res) => {
     // Save admin to database
     await admin.save();
 
-    // Send OTP
-    const otpResponse = await sendOtpToUser(admin.phone); // Assuming sendOtpToUser accepts phone number
-
-    // Update admin document with OTP
-    admin.otp = otpResponse.code; // Assuming otpResponse contains the OTP code
-    await admin.save();
-
-    res.json({ msg: "Admin registered. OTP sent for verification." });
+    res.json({ msg: "Admin registered." });
   } catch (error) {
     console.error(error);
     res.status(500).send("Server Error");

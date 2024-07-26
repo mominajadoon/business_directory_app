@@ -111,15 +111,23 @@ exports.addBusiness = async (req, res) => {
   const gallery = req.files["gallery"]
     ? req.files["gallery"].map((file) => file.location)
     : [];
-
   let locationData = null;
-  if (location && location.lat && location.lng) {
+  if (
+    location &&
+    location.type === "Point" &&
+    location.coordinates &&
+    location.coordinates.length === 2
+  ) {
     locationData = {
       type: "Point",
-      coordinates: [parseFloat(location.lng), parseFloat(location.lat)],
+      coordinates: [
+        parseFloat(location.coordinates[0]),
+        parseFloat(location.coordinates[1]),
+      ],
     };
+  } else {
+    return res.status(400).json({ msg: "Invalid location data" });
   }
-
   try {
     const newBusiness = new Business({
       name,
@@ -179,7 +187,10 @@ exports.updateBusiness = async (req, res) => {
       return res.status(404).json({ msg: "Business not found" });
     }
 
-    if (business.owner.toString() !== req.user.id) {
+    if (
+      business.owner.toString() !== req.user.id ||
+      req.user.role !== "admin"
+    ) {
       return res.status(401).json({ msg: "User not authorized" });
     }
 
