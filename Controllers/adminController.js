@@ -254,32 +254,27 @@ exports.EditBusiness = async (req, res) => {
   } = req.body;
 
   try {
-    // Find the existing business
-    const business = await Business.findById(businessId);
+    // Prepare the update data
+    const updateData = {};
 
-    if (!business) {
-      return res.status(404).json({ msg: "Business not found" });
-    }
-
-    // Update business details
-    if (name) business.name = name;
-    if (category) business.category = category;
-    if (description) business.description = description;
-    if (phone) business.phone = phone;
-    if (email) business.email = email;
-    if (website) business.website = website;
-    if (socialMedia) business.socialMedia = socialMedia;
+    if (name) updateData.name = name;
+    if (category) updateData.category = category;
+    if (description) updateData.description = description;
+    if (phone) updateData.phone = phone;
+    if (email) updateData.email = email;
+    if (website) updateData.website = website;
+    if (socialMedia) updateData.socialMedia = socialMedia;
 
     // Process file uploads if provided
     if (req.files) {
       if (req.files["profilePicture"]) {
-        business.profilePicture = req.files["profilePicture"][0].location;
+        updateData.profilePicture = req.files["profilePicture"][0].location;
       }
       if (req.files["coverPicture"]) {
-        business.coverPicture = req.files["coverPicture"][0].location;
+        updateData.coverPicture = req.files["coverPicture"][0].location;
       }
       if (req.files["gallery"]) {
-        business.gallery = req.files["gallery"].map((file) => file.location);
+        updateData.gallery = req.files["gallery"].map((file) => file.location);
       }
     }
 
@@ -290,7 +285,7 @@ exports.EditBusiness = async (req, res) => {
       location.coordinates &&
       location.coordinates.length === 2
     ) {
-      business.location = {
+      updateData.location = {
         type: "Point",
         coordinates: [
           parseFloat(location.coordinates[0]),
@@ -300,16 +295,100 @@ exports.EditBusiness = async (req, res) => {
     }
 
     // Set isApproved to false after update
-    business.isApproved = false;
+    updateData.isApproved = true;
 
-    // Save the updated business
-    await business.save();
-    res.json({ msg: "Business updated successfully", business });
+    // Find and update the business
+    const updatedBusiness = await Business.findByIdAndUpdate(
+      businessId,
+      { $set: updateData },
+      { new: true, runValidators: true }
+    );
+
+    if (!updatedBusiness) {
+      return res.status(404).json({ msg: "Business not found" });
+    }
+
+    res.json({
+      msg: "Business updated successfully",
+      business: updatedBusiness,
+    });
   } catch (error) {
     console.error(error);
     res.status(500).send("Server Error");
   }
 };
+
+// exports.EditBusiness = async (req, res) => {
+//   const { id: businessId } = req.body;
+
+//   const {
+//     name,
+//     category,
+//     description,
+//     phone,
+//     email,
+//     website,
+//     socialMedia,
+//     location,
+//   } = req.body;
+
+//   try {
+//     // Find the existing business
+//     const business = await Business.findById(businessId);
+
+//     if (!business) {
+//       return res.status(404).json({ msg: "Business not found" });
+//     }
+
+//     // Update business details
+//     if (name) business.name = name;
+//     if (category) business.category = category;
+//     if (description) business.description = description;
+//     if (phone) business.phone = phone;
+//     if (email) business.email = email;
+//     if (website) business.website = website;
+//     if (socialMedia) business.socialMedia = socialMedia;
+
+//     // Process file uploads if provided
+//     if (req.files) {
+//       if (req.files["profilePicture"]) {
+//         business.profilePicture = req.files["profilePicture"][0].location;
+//       }
+//       if (req.files["coverPicture"]) {
+//         business.coverPicture = req.files["coverPicture"][0].location;
+//       }
+//       if (req.files["gallery"]) {
+//         business.gallery = req.files["gallery"].map((file) => file.location);
+//       }
+//     }
+
+//     // Update location if provided
+//     if (
+//       location &&
+//       location.type === "Point" &&
+//       location.coordinates &&
+//       location.coordinates.length === 2
+//     ) {
+//       business.location = {
+//         type: "Point",
+//         coordinates: [
+//           parseFloat(location.coordinates[0]),
+//           parseFloat(location.coordinates[1]),
+//         ],
+//       };
+//     }
+
+//     // Set isApproved to false after update
+//     business.isApproved = true;
+
+//     // Save the updated business
+//     await business.save();
+//     res.json({ msg: "Business updated successfully", business });
+//   } catch (error) {
+//     console.error(error);
+//     res.status(500).send("Server Error");
+//   }
+// };
 
 exports.deleteBusiness = async (req, res) => {
   const { id: businessId } = req.body;
