@@ -56,6 +56,11 @@ exports.loginAdmin = async (req, res) => {
       return res.status(400).json({ msg: "Admin Not Found!" });
     }
 
+    // Check if admin is blocked
+    if (admin.block) {
+      return res.status(403).json({ msg: "Admin is blocked" });
+    }
+
     // Check if password matches
     const isMatch = await bcrypt.compare(password, admin.password);
     if (!isMatch) {
@@ -237,8 +242,6 @@ exports.blockUser = async (req, res) => {
 exports.EditBusiness = async (req, res) => {
   const { id: businessId } = req.body;
 
-  // console.log(req.files);
-
   const {
     name,
     category,
@@ -259,13 +262,13 @@ exports.EditBusiness = async (req, res) => {
     }
 
     // Update business details
-    business.name = name || business.name;
-    business.category = category || business.category;
-    business.description = description || business.description;
-    business.phone = phone || business.phone;
-    business.email = email || business.email;
-    business.website = website || business.website;
-    business.socialMedia = socialMedia || business.socialMedia;
+    if (name) business.name = name;
+    if (category) business.category = category;
+    if (description) business.description = description;
+    if (phone) business.phone = phone;
+    if (email) business.email = email;
+    if (website) business.website = website;
+    if (socialMedia) business.socialMedia = socialMedia;
 
     // Process file uploads if provided
     if (req.files) {
@@ -297,7 +300,7 @@ exports.EditBusiness = async (req, res) => {
     }
 
     // Set isApproved to false after update
-    business.isApproved = true;
+    business.isApproved = false;
 
     // Save the updated business
     await business.save();
@@ -360,7 +363,7 @@ exports.verifyEvent = async (req, res) => {
     }
 
     // Verify the event
-    event.isApproved = true;
+    event.isVerified = true;
 
     // Save the updated event
     await event.save();

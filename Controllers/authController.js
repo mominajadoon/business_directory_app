@@ -68,9 +68,14 @@ exports.login = async (req, res) => {
     if (!user.isVerified) {
       return res.status(400).json({ msg: "Please verify your account" });
     }
+    // Check if user is blocked
+    if (user.block) {
+      return res
+        .status(403)
+        .json({ msg: "Your account is blocked. Please contact support." });
+    }
 
     // Generate JWT
-    // Generate JWT without expiration
     const payload = {
       user: {
         id: user.id,
