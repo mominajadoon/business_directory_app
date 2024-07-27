@@ -2,10 +2,10 @@ const Events = require("../Models/Events");
 const Event = require("../Models/Events");
 
 const User = require("../Models/User");
-
 exports.addEvent = async (req, res) => {
-  const { image, description, name, date, time, location } = req.body;
+  const { description, name, date, time, location } = req.body;
   const createdBy = req.user.id;
+  const image = req.files.image[0].location; // Get the image URL from S3
 
   try {
     const newEvent = new Event({
@@ -26,7 +26,6 @@ exports.addEvent = async (req, res) => {
     res.status(500).send("Server Error");
   }
 };
-
 exports.updateEvent = async (req, res) => {
   const { id } = req.params;
   const { image, description, name, date, time, location } = req.body;

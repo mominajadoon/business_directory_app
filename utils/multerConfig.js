@@ -24,6 +24,7 @@ const upload = multer({
   { name: "profilePicture", maxCount: 1 },
   { name: "coverPicture", maxCount: 1 },
   { name: "gallery", maxCount: 10 },
+  { name: "image", maxCount: 1 },
 ]);
 
 module.exports = upload;
