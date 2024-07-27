@@ -1,4 +1,5 @@
 const express = require("express");
+const cors = require("cors");
 const dotenv = require("dotenv");
 const connectDB = require("./config/db");
 const authRoutes = require("./Routes/authRoutes.js");
@@ -17,6 +18,9 @@ app.use(express.json({ limit: "50mb" }));
 
 // Middleware to parse URL-encoded bodies with increased limit
 app.use(express.urlencoded({ limit: "50mb", extended: true }));
+
+// CORS middleware to allow all origins
+app.use(cors());
 
 // Routes
 app.use("/api/auth", authRoutes);
