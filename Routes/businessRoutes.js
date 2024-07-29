@@ -11,6 +11,7 @@ const {
   addComment,
   getReviewsByBusiness,
   addBusinessToFavorites,
+  getBusinessById,
 } = require("../Controllers/businessController");
 const { isAdmin, isAuthenticated } = require("../middleware/authmiddleware");
 const {
@@ -40,7 +41,7 @@ router.put(
   markNotificationAsRead
 );
 // Get business by ID from request body
-router.post("/singlebusiness", getBusinessById);
+router.get("/:id", getBusinessById);
 // Route to add a business to favorites
 router.post("/:businessId/favorite", isAuthenticated, addBusinessToFavorites);
 

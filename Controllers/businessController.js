@@ -341,12 +341,7 @@ exports.getAllBusinesses = async (req, res) => {
 };
 exports.getBusinessById = async (req, res) => {
   try {
-    const businessId = req.body.id;
-
-    if (!businessId) {
-      return res.status(400).json({ msg: "ID is required" });
-    }
-
+    const businessId = req.params.id;
     const business = await Business.findById(businessId);
 
     if (!business) {
