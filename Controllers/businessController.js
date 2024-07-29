@@ -339,6 +339,26 @@ exports.getAllBusinesses = async (req, res) => {
     res.status(500).send("Server Error");
   }
 };
+exports.getBusinessById = async (req, res) => {
+  try {
+    const businessId = req.body.id;
+
+    if (!businessId) {
+      return res.status(400).json({ msg: "ID is required" });
+    }
+
+    const business = await Business.findById(businessId);
+
+    if (!business) {
+      return res.status(404).json({ msg: "Business not found" });
+    }
+
+    res.json(business);
+  } catch (error) {
+    console.error("Error fetching business:", error);
+    res.status(500).send("Server Error");
+  }
+};
 
 exports.searchBusinesses = async (req, res) => {
   const { name, category, keywords, lng, lat, radius = 5000 } = req.query;

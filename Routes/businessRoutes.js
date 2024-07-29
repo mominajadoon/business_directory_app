@@ -39,6 +39,8 @@ router.put(
   isAuthenticated,
   markNotificationAsRead
 );
+// Get business by ID from request body
+router.post("/singlebusiness", getBusinessById);
 // Route to add a business to favorites
 router.post("/:businessId/favorite", isAuthenticated, addBusinessToFavorites);
 
