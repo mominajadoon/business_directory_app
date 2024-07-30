@@ -46,3 +46,4 @@ router.get("/:id", getBusinessById);
 router.post("/:businessId/favorite", isAuthenticated, addBusinessToFavorites);
 
 module.exports = router;
+//update
