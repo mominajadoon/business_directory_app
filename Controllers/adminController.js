@@ -5,7 +5,7 @@ const User = require("../Models/User");
 const Business = require("../Models/Business");
 const mongoose = require("mongoose");
 const Event = require("../Models/Events");
-
+// register
 exports.registerAdmin = async (req, res) => {
   const { name, phone, password } = req.body;
 
