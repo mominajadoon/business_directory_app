@@ -5,6 +5,7 @@ const AdminSchema = new mongoose.Schema({
   phone: { type: String, required: true, unique: true },
   password: { type: String, required: true },
   role: { type: String, default: "admin" },
+  loginAllowed: { type: Boolean, default: false },
   block: { type: Boolean, default: false },
 });
 

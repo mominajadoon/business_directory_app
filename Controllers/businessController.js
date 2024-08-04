@@ -9,6 +9,8 @@ const createNotification = require("../Controllers/notificationController");
 const upload = require("../utils/multerConfig");
 
 // exports.addBusiness = async (req, res) => {
+//   console.log(req.files);
+
 //   const {
 //     name,
 //     category,
@@ -17,11 +19,8 @@ const upload = require("../utils/multerConfig");
 //     email,
 //     website,
 //     socialMedia,
-//     // address,
 //     location,
 //   } = req.body;
-
-//   const ownerId = req.user.id;
 
 //   if (
 //     !req.files ||
@@ -32,11 +31,6 @@ const upload = require("../utils/multerConfig");
 //     return res.status(400).json({ msg: "All required files must be uploaded" });
 //   }
 
-//   // const profilePicture = req.files["profilePicture"][0].location;
-//   // const coverPicture = req.files["coverPicture"][0].location;
-//   // const gallery = req.files["gallery"].map((file) => file.location);
-
-//   // Files will be available in req.files
 //   const profilePicture = req.files["profilePicture"]
 //     ? req.files["profilePicture"][0].location
 //     : null;
@@ -46,11 +40,22 @@ const upload = require("../utils/multerConfig");
 //   const gallery = req.files["gallery"]
 //     ? req.files["gallery"].map((file) => file.location)
 //     : [];
-//   // Validate location
-//   if (!location || !location.lat || !location.lng) {
-//     return res
-//       .status(400)
-//       .json({ msg: "mapLocation with lat and lng is required" });
+//   let locationData = null;
+//   if (
+//     location &&
+//     location.type === "Point" &&
+//     location.coordinates &&
+//     location.coordinates.length === 2
+//   ) {
+//     locationData = {
+//       type: "Point",
+//       coordinates: [
+//         parseFloat(location.coordinates[0]),
+//         parseFloat(location.coordinates[1]),
+//       ],
+//     };
+//   } else {
+//     return res.status(400).json({ msg: "Invalid location data" });
 //   }
 //   try {
 //     const newBusiness = new Business({
@@ -64,14 +69,11 @@ const upload = require("../utils/multerConfig");
 //       website,
 //       socialMedia,
 //       gallery,
-//       // address,
-//       location: {
-//         type: "Point",
-//         coordinates: [parseFloat(location.lng), parseFloat(location.lat)],
-//       },
-//       owner: ownerId,
+//       location: locationData,
+//       owner: req.user.id,
 //       isApproved: false,
 //     });
+
 //     await newBusiness.save();
 //     res.json({ msg: "Business added, waiting for admin approval." });
 //   } catch (error) {
@@ -79,8 +81,9 @@ const upload = require("../utils/multerConfig");
 //     res.status(500).send("Server Error");
 //   }
 // };
+
 exports.addBusiness = async (req, res) => {
-  console.log(req.files); // Debugging
+  console.log(req.files);
 
   const {
     name,
@@ -111,6 +114,7 @@ exports.addBusiness = async (req, res) => {
   const gallery = req.files["gallery"]
     ? req.files["gallery"].map((file) => file.location)
     : [];
+
   let locationData = null;
   if (
     location &&
@@ -128,6 +132,7 @@ exports.addBusiness = async (req, res) => {
   } else {
     return res.status(400).json({ msg: "Invalid location data" });
   }
+
   try {
     const newBusiness = new Business({
       name,
@@ -152,7 +157,6 @@ exports.addBusiness = async (req, res) => {
     res.status(500).send("Server Error");
   }
 };
-
 exports.updateBusiness = async (req, res) => {
   const businessId = req.params.id; // Get business ID from URL parameters
 
