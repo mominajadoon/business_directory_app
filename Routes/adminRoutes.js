@@ -14,6 +14,9 @@ const {
   deleteBusiness,
   verifyEvent,
   editEvent,
+  approveAdminLoginRequest,
+  rejectAdminLoginRequest,
+  getAllAdminLoginRequests,
 } = require("../Controllers/adminController");
 const {
   approveBusiness,
@@ -38,6 +41,9 @@ const upload = require("../utils/multerConfig");
 
 router.post("/register-admin", isAuthenticated, isSuperAdmin, registerAdmin);
 router.post("/login", loginAdmin);
+
+router.post("/login-approve", approveAdminLoginRequest);
+router.post("/login-reject", rejectAdminLoginRequest);
 
 // Approve business modifications
 router.put(
@@ -101,9 +107,16 @@ router.delete("/delete-user", isAuthenticated, isAdminOrSuperAdmin, deleteUser);
 // Route to edit a business by admin
 // router.put("/edit-business/:id", isAuthenticated, isAdmin, adminEditBusiness);
 router.get("/all-admins", isAuthenticated, isSuperAdmin, getAllAdmins);
+router.get(
+  "/all-loginRequests",
+  isAuthenticated,
+  isSuperAdmin,
+  getAllAdminLoginRequests
+);
 router.delete("/delete-admin", isAuthenticated, isSuperAdmin, deleteAdmin);
 router.put("/event/verify", isAuthenticated, isAdminOrSuperAdmin, verifyEvent);
 router.put("/block-admin", isAuthenticated, isSuperAdmin, blockAdmin);
+
 router.delete(
   "/business/delete",
   isAuthenticated,

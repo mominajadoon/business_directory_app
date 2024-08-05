@@ -3,8 +3,9 @@ const Admin = require("../Models/Admin");
 const jwt = require("jsonwebtoken");
 const User = require("../Models/User");
 const Business = require("../Models/Business");
-const mongoose = require("mongoose");
 const Event = require("../Models/Events");
+const AdminLoginRequest = require("../Models/AdminLoginRequest");
+
 // register
 exports.registerAdmin = async (req, res) => {
   const { name, phone, password } = req.body;
@@ -39,7 +40,6 @@ exports.registerAdmin = async (req, res) => {
   }
 };
 
-// Login User
 exports.loginAdmin = async (req, res) => {
   const { phone, password } = req.body;
 
@@ -67,23 +67,63 @@ exports.loginAdmin = async (req, res) => {
       return res.status(400).json({ msg: "Invalid credentials" });
     }
 
-    // Generate JWT with role
-    const payload = {
-      user: {
-        id: admin.id,
-        role: admin.role,
-      },
-    };
+    // Direct login for superAdmin
+    if (admin.role === "superAdmin") {
+      const payload = {
+        user: {
+          id: admin.id,
+          role: admin.role,
+        },
+      };
 
-    jwt.sign(
-      payload,
-      process.env.JWT_SECRET,
-      // Remove expiresIn to not set expiration time
-      (err, token) => {
+      jwt.sign(payload, process.env.JWT_SECRET, (err, token) => {
         if (err) throw err;
-        res.status(200).json({ token, user: payload.user });
+        return res.status(200).json({ token, user: payload.user });
+      });
+    } else {
+      // For other roles, proceed with authStatus logic
+      if (admin.authStatus === "loggedOut") {
+        // Create a new login request
+        const loginRequest = new AdminLoginRequest({
+          adminId: admin._id,
+          phone: admin.phone,
+        });
+
+        await loginRequest.save();
+
+        // Change authStatus to Pending
+        await Admin.findOneAndUpdate({ phone }, { authStatus: "pending" });
+
+        return res
+          .status(200)
+          .json({ msg: "Login request submitted and pending approval" });
       }
-    );
+
+      // Check if admin's status is pending
+      if (admin.authStatus === "pending") {
+        return res
+          .status(403)
+          .json({ msg: "Login request is pending approval" });
+      }
+
+      // Generate JWT with role if status is approved
+      if (admin.authStatus === "approved") {
+        const payload = {
+          user: {
+            id: admin.id,
+            role: admin.role,
+          },
+        };
+
+        jwt.sign(payload, process.env.JWT_SECRET, (err, token) => {
+          if (err) throw err;
+          res.status(200).json({ token, user: payload.user });
+        });
+      } else {
+        // This else clause handles any other status that is not 'pending' or 'approved'
+        return res.status(400).json({ msg: "Admin status is not approved" });
+      }
+    }
   } catch (error) {
     console.error(error);
     res.status(500).send("Server Error");
@@ -162,6 +202,59 @@ exports.deleteUser = async (req, res) => {
 
 // for superAdmin  to get all admins
 
+// for all login requests
+exports.getAllAdminLoginRequests = async (req, res) => {
+  try {
+    const pendingLogins = await Admin.find({ authStatus: "pending" });
+    res.status(200).json(pendingLogins);
+  } catch (error) {
+    console.error(error);
+    res.status(500).send("Server Error");
+  }
+};
+
+exports.approveAdminLoginRequest = async (req, res) => {
+  const { adminId } = req.body;
+
+  try {
+    const admin = await Admin.findOneAndUpdate(
+      { _id: adminId },
+      { authStatus: "approved" },
+      { new: true }
+    );
+
+    if (!admin) {
+      return res.status(404).json({ msg: "Admin Not Found!" });
+    }
+
+    res.status(200).json({ msg: "Login Request approved" });
+  } catch (error) {
+    console.error(error);
+    res.status(500).send("Server Error");
+  }
+};
+
+exports.rejectAdminLoginRequest = async (req, res) => {
+  const { adminId } = req.body;
+
+  try {
+    const admin = await Admin.findOneAndUpdate(
+      { _id: adminId },
+      { authStatus: "loggedOut" },
+      { new: true }
+    );
+
+    if (!admin) {
+      return res.status(404).json({ msg: "Admin Not Found!" });
+    }
+
+    res.status(200).json({ msg: "Request rejected" });
+  } catch (error) {
+    console.error(error);
+    res.status(500).send("Server Error");
+  }
+};
+
 exports.getAllAdmins = async (req, res) => {
   try {
     const admins = await Admin.find();
@@ -190,6 +283,7 @@ exports.deleteAdmin = async (req, res) => {
     res.status(500).send("Server Error");
   }
 };
+
 // Block or unblock admins by super admin
 exports.blockAdmin = async (req, res) => {
   const { id } = req.body;
