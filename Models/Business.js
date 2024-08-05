@@ -12,17 +12,18 @@ const BusinessSchema = new mongoose.Schema(
     website: { type: String },
     socialMedia: { type: String },
     gallery: { type: [String] },
-    location: {
-      type: {
-        type: String,
-        enum: ["Point"],
-        required: true,
-      },
-      coordinates: {
-        type: [Number],
-        required: true,
-      },
-    },
+    location: { type: String, required: true },
+    // location: {
+    //   type: {
+    //     type: String,
+    //     enum: ["Point"],
+    //     required: true,
+    //   },
+    //   coordinates: {
+    //     type: [Number],
+    //     required: true,
+    //   },
+    // },
     owner: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "User",
@@ -49,12 +50,12 @@ const BusinessSchema = new mongoose.Schema(
   }
 );
 
-BusinessSchema.index({ location: "2dsphere" });
-BusinessSchema.index({
-  name: "text",
-  category: "text",
-  description: "text",
-  keywords: "text",
-});
+// // BusinessSchema.index({ location: "2dsphere" });
+// BusinessSchema.index({
+//   name: "text",
+//   category: "text",
+//   description: "text",
+//   keywords: "text",
+// });
 
 module.exports = mongoose.model("Business", BusinessSchema);

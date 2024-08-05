@@ -115,21 +115,7 @@ exports.addBusiness = async (req, res) => {
     ? req.files["gallery"].map((file) => file.location)
     : [];
 
-  let locationData = null;
-  if (
-    location &&
-    location.type === "Point" &&
-    location.coordinates &&
-    location.coordinates.length === 2
-  ) {
-    locationData = {
-      type: "Point",
-      coordinates: [
-        parseFloat(location.coordinates[0]),
-        parseFloat(location.coordinates[1]),
-      ],
-    };
-  } else {
+  if (!location || typeof location !== "string") {
     return res.status(400).json({ msg: "Invalid location data" });
   }
 
@@ -145,7 +131,7 @@ exports.addBusiness = async (req, res) => {
       website,
       socialMedia,
       gallery,
-      location: locationData,
+      location, // Simplified location
       owner: req.user.id,
       isApproved: false,
     });
@@ -157,6 +143,7 @@ exports.addBusiness = async (req, res) => {
     res.status(500).send("Server Error");
   }
 };
+
 exports.updateBusiness = async (req, res) => {
   const businessId = req.params.id; // Get business ID from URL parameters
 
