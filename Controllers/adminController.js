@@ -257,7 +257,7 @@ exports.rejectAdminLoginRequest = async (req, res) => {
 
 exports.getAllAdmins = async (req, res) => {
   try {
-    const admins = await Admin.find();
+    const admins = await Admin.find({ role: "admin" });
     res.json(admins);
   } catch (error) {
     console.error(error);
