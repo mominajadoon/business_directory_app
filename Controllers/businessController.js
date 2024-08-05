@@ -115,8 +115,8 @@ exports.addBusiness = async (req, res) => {
     ? req.files["gallery"].map((file) => file.location)
     : [];
 
-  if (!location || typeof location !== "string") {
-    return res.status(400).json({ msg: "Invalid location data" });
+  if (!location) {
+    return res.status(400).json({ msg: "Location is required." });
   }
 
   try {
@@ -137,7 +137,10 @@ exports.addBusiness = async (req, res) => {
     });
 
     await newBusiness.save();
-    res.json({ msg: "Business added, waiting for admin approval." });
+    res.json({
+      msg: "Business added, waiting for admin approval.",
+      newBusiness,
+    });
   } catch (error) {
     console.error(error);
     res.status(500).send("Server Error");
