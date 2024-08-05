@@ -131,7 +131,7 @@ exports.addBusiness = async (req, res) => {
       website,
       socialMedia,
       gallery,
-      location, // Simplified location
+      location,
       owner: req.user.id,
       isApproved: false,
     });
@@ -139,7 +139,6 @@ exports.addBusiness = async (req, res) => {
     await newBusiness.save();
     res.json({
       msg: "Business added, waiting for admin approval.",
-      newBusiness,
     });
   } catch (error) {
     console.error(error);
