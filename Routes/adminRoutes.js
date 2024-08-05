@@ -42,8 +42,18 @@ const upload = require("../utils/multerConfig");
 router.post("/register-admin", isAuthenticated, isSuperAdmin, registerAdmin);
 router.post("/login", loginAdmin);
 
-router.post("/login-approve", approveAdminLoginRequest);
-router.post("/login-reject", rejectAdminLoginRequest);
+router.put(
+  "/login-approve",
+  isAuthenticated,
+  isSuperAdmin,
+  approveAdminLoginRequest
+);
+router.put(
+  "/login-reject",
+  isAuthenticated,
+  isSuperAdmin,
+  rejectAdminLoginRequest
+);
 
 // Approve business modifications
 router.put(
