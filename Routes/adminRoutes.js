@@ -51,7 +51,7 @@ router.put(
 router.put(
   "/login-reject",
   isAuthenticated,
-  isSuperAdmin,
+  isAdminOrSuperAdmin,
   rejectAdminLoginRequest
 );
 
