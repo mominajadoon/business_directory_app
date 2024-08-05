@@ -216,7 +216,7 @@ exports.blockAdmin = async (req, res) => {
 };
 
 exports.blockUser = async (req, res) => {
-  const { id } = req.body; // Get ID from request body
+  const { id } = req.body;
 
   try {
     const user = await User.findById(id);
@@ -447,6 +447,34 @@ exports.verifyEvent = async (req, res) => {
     // Save the updated event
     await event.save();
     res.json({ msg: "Event verified successfully", event });
+  } catch (error) {
+    console.error(error);
+    res.status(500).send("Server Error");
+  }
+};
+
+exports.editEvent = async (req, res) => {
+  const { id, image, description, name, date, time, location } = req.body;
+
+  try {
+    // Find the event by id
+    let event = await Event.findById(id);
+
+    if (!event) {
+      return res.status(404).json({ msg: "Event not found" });
+    }
+
+    // Update the event fields
+    event.image = image || event.image;
+    event.description = description || event.description;
+    event.name = name || event.name;
+    event.date = date || event.date;
+    event.time = time || event.time;
+    event.location = location || event.location;
+
+    await event.save();
+
+    res.json({ msg: "Event updated successfully", event });
   } catch (error) {
     console.error(error);
     res.status(500).send("Server Error");

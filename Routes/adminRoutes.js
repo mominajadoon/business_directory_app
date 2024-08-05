@@ -13,6 +13,7 @@ const {
   deleteEvent,
   deleteBusiness,
   verifyEvent,
+  editEvent,
 } = require("../Controllers/adminController");
 const {
   approveBusiness,
@@ -116,13 +117,22 @@ router.delete(
   deleteEvent
 );
 
-router.put("/block-user", isAuthenticated, isAdminOrSuperAdmin, blockUser);
 router.put(
-  "/update",
+  "/update-event",
+  isAuthenticated,
+  isAdminOrSuperAdmin,
+  upload,
+  editEvent
+);
+
+router.put(
+  "/update-business",
   isAuthenticated,
   isAdminOrSuperAdmin,
   upload,
   EditBusiness
 );
+
+router.put("/block-user", isAuthenticated, isAdminOrSuperAdmin, blockUser);
 
 module.exports = router;
