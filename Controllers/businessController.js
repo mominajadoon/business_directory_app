@@ -411,7 +411,7 @@ exports.getGeolocation = async (req, res) => {
 // Function to add a review to a business
 exports.addReview = async (req, res) => {
   const { businessId } = req.params;
-  const { text, rating, images } = req.body;
+  const { text, rating, image } = req.body;
   const userId = req.user.id; // Assuming req.user is populated by isAuthenticated middleware
 
   try {
@@ -426,7 +426,7 @@ exports.addReview = async (req, res) => {
       business: businessId,
       text,
       rating,
-      images,
+      image,
     });
 
     await newReview.save();
