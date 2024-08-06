@@ -5,7 +5,7 @@ const { Client } = require("@googlemaps/google-maps-services-js");
 const client = new Client({});
 const Review = require("../Models/Reviews");
 const Notification = require("../Models/Notifications");
-const createNotification = require("../Controllers/notificationController");
+const { createNotification } = require("../Controllers/notificationController");
 const upload = require("../utils/multerConfig");
 
 // exports.addBusiness = async (req, res) => {
@@ -323,6 +323,7 @@ exports.transferOwnership = async (req, res) => {
     res.status(500).send("Server Error");
   }
 };
+
 exports.getAllBusinesses = async (req, res) => {
   try {
     const businesses = await Business.find();
@@ -408,7 +409,6 @@ exports.getGeolocation = async (req, res) => {
 };
 
 // Function to add a review to a business
-// Example function using createNotification
 exports.addReview = async (req, res) => {
   const { businessId } = req.params;
   const { text, rating, images } = req.body;

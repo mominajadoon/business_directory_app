@@ -16,7 +16,7 @@ const createNotification = async (recipient, sender, type, entityId) => {
     throw new Error("Failed to create notification");
   }
 };
-// Function to fetch notifications for a user
+
 // Function to fetch notifications for a user
 const getNotifications = async (req, res) => {
   try {

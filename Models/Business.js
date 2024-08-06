@@ -50,12 +50,12 @@ const BusinessSchema = new mongoose.Schema(
   }
 );
 
-// // BusinessSchema.index({ location: "2dsphere" });
-// BusinessSchema.index({
-//   name: "text",
-//   category: "text",
-//   description: "text",
-//   keywords: "text",
-// });
+// BusinessSchema.index({ location: "2dsphere" });
+BusinessSchema.index({
+  name: "text",
+  category: "text",
+  description: "text",
+  keywords: "text",
+});
 
 module.exports = mongoose.model("Business", BusinessSchema);
