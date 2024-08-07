@@ -175,7 +175,7 @@ exports.updateBusiness = async (req, res) => {
     business.category = category || business.category;
     business.description = description || business.description;
     business.phone = phone || business.phone;
-    business.email = email || business.email;
+    business.businessEmail = email || business.businessEmail;
     business.website = website || business.website;
     business.socialMedia = socialMedia || business.socialMedia;
 

@@ -8,7 +8,7 @@ const BusinessSchema = new mongoose.Schema(
     category: { type: String, required: true },
     description: { type: String },
     phone: { type: String, required: true },
-    email: { type: String },
+    businessEmail: { type: String },
     website: { type: String },
     socialMedia: { type: String },
     gallery: { type: [String] },

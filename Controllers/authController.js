@@ -1,39 +1,49 @@
 const User = require("../Models/User");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
-const { sendOtpToUser, apiClient } = require("../config/nimba");
+// const { sendOtpToUser } = require("../config/nimba");
+const { sendOTPEmail } = require("../config/sendGridMail");
+
 const Business = require("../Models/Business");
 const Event = require("../Models/Events");
 
 // Register User
 exports.register = async (req, res) => {
-  const { name, phone, password } = req.body;
+  const { name, email, password } = req.body;
 
   try {
     // Validate input fields
-    if (!name || !phone || !password) {
+    if (!name || !email || !password) {
       return res.status(400).json({ msg: "Please enter all fields" });
     }
 
     // Check if user already exists
-    let user = await User.findOne({ phone });
+    let user = await User.findOne({ email });
     if (user) {
       return res.status(400).json({ msg: "User already exists" });
     }
 
     // Create new user instance with null otp field
     let otp = null;
-    user = new User({ name, phone, password, otp });
+    user = new User({ name, email, password, otp });
 
     // Hash password
     const salt = await bcrypt.genSalt(10);
     user.password = await bcrypt.hash(password, salt);
 
+    // Generate and send otp
+    const generated_otp = Math.floor(
+      100000 + Math.random() * 900000
+    ).toString();
+    user.otp = generated_otp;
+
     // Save user to database
     await user.save();
 
     // Send OTP
-    await sendOtpToUser(user.phone); // Assuming sendOtpToUser accepts phone number
+    // await sendOtpToUser(user.phone);
+
+    await sendOTPEmail(user.email, generated_otp);
 
     res.json({ msg: "User registered. OTP sent for verification." });
   } catch (error) {
@@ -44,16 +54,16 @@ exports.register = async (req, res) => {
 
 // Login User
 exports.login = async (req, res) => {
-  const { phone, password } = req.body;
+  const { email, password } = req.body;
 
   try {
     // Validate input fields
-    if (!phone || !password) {
+    if (!email || !password) {
       return res.status(400).json({ msg: "Please enter all fields" });
     }
 
     // Check if user exists
-    const user = await User.findOne({ phone });
+    const user = await User.findOne({ email });
     if (!user) {
       return res.status(400).json({ msg: "Invalid credentials" });
     }
@@ -101,10 +111,10 @@ exports.login = async (req, res) => {
 };
 // Verify OTP
 exports.verifyOtp = async (req, res) => {
-  const { phone, otp } = req.body;
+  const { email, otp } = req.body;
 
   try {
-    const user = await User.findOne({ phone });
+    const user = await User.findOne({ email });
     if (!user) {
       return res.status(404).json({ msg: "User not found" });
     }
@@ -126,15 +136,21 @@ exports.verifyOtp = async (req, res) => {
 
 // Resend Otp
 exports.resendOtp = async (req, res) => {
-  const { phone } = req.body;
+  const { email } = req.body;
 
   try {
-    const user = await User.findOne({ phone });
+    const user = await User.findOne({ email });
     if (!user) {
       return res.status(404).json({ msg: "User not found" });
     }
 
-    await sendOtpToUser(phone);
+    // Generate OTP and send it to the user
+    const otp = Math.floor(100000 + Math.random() * 900000).toString();
+    user.otp = otp;
+    await user.save();
+
+    await sendOTPEmail(user.email, otp);
+    // await sendOtpToUser(email);
     await user.save();
 
     res.json({ msg: "Otp resent successfully" });
@@ -146,22 +162,23 @@ exports.resendOtp = async (req, res) => {
 
 // Forgot Password - Send OTP
 exports.forgotPassword = async (req, res) => {
-  const { phone } = req.body;
+  const { email } = req.body;
 
   try {
-    const user = await User.findOne({ phone });
+    const user = await User.findOne({ email });
     if (!user) {
       return res.status(404).json({ msg: "User not found" });
     }
 
     // Generate OTP and send it to the user
-    const otp = Math.floor(100000 + Math.random() * 900000);
+    const otp = Math.floor(100000 + Math.random() * 900000).toString();
     user.otp = otp;
     await user.save();
 
-    await sendOtpToUser(user.phone, `Your verification code is ${otp}`);
+    await sendOTPEmail(user.email, otp);
+    // await sendOtpToUser(user.email, `Your verification code is ${otp}`);
 
-    res.json({ msg: "OTP sent to your phone for password reset" });
+    res.json({ msg: "OTP sent to your Email for password reset" });
   } catch (error) {
     console.error(error);
     res.status(500).send("Server Error");
@@ -169,16 +186,16 @@ exports.forgotPassword = async (req, res) => {
 };
 
 exports.newPassword = async (req, res) => {
-  const { phone, password } = req.body;
+  const { email, password } = req.body;
 
   try {
     // Validate input fields
-    if (!phone || !password) {
+    if (!email || !password) {
       return res.status(400).json({ msg: "Please enter all fields" });
     }
 
     // Check if user already exists
-    let user = await User.findOne({ phone });
+    let user = await User.findOne({ email });
     if (!user) {
       return res.status(400).json({ msg: "User Doesn't exist" });
     }
@@ -189,7 +206,7 @@ exports.newPassword = async (req, res) => {
 
     // Update password field
     await User.findOneAndUpdate(
-      { phone },
+      { email },
       { $set: { password: hashedPassword, otp: null } },
       { new: true }
     );

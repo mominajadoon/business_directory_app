@@ -8,23 +8,23 @@ const AdminLoginRequest = require("../Models/AdminLoginRequest");
 
 // register
 exports.registerAdmin = async (req, res) => {
-  const { name, phone, password } = req.body;
+  const { name, email, password } = req.body;
 
   try {
     // Validate input fields
-    if (!name || !phone || !password) {
+    if (!name || !email || !password) {
       return res.status(400).json({ msg: "Please enter all fields" });
     }
 
     // Check if admin already exists
-    let admin = await Admin.findOne({ phone });
+    let admin = await Admin.findOne({ email });
 
     if (admin) {
       return res.status(400).json({ msg: "Admin already exists" });
     }
 
     // Create new admin instance with null otp field
-    admin = new Admin({ name, phone, password, role: "admin" });
+    admin = new Admin({ name, email, password, role: "admin" });
 
     // Hash password
     const salt = await bcrypt.genSalt(10);
@@ -41,16 +41,16 @@ exports.registerAdmin = async (req, res) => {
 };
 
 exports.loginAdmin = async (req, res) => {
-  const { phone, password } = req.body;
+  const { email, password } = req.body;
 
   try {
     // Validate input fields
-    if (!phone || !password) {
+    if (!email || !password) {
       return res.status(400).json({ msg: "Please enter all fields" });
     }
 
     // Check if user exists
-    const admin = await Admin.findOne({ phone });
+    const admin = await Admin.findOne({ email });
 
     if (!admin) {
       return res.status(400).json({ msg: "Admin Not Found!" });
@@ -86,13 +86,13 @@ exports.loginAdmin = async (req, res) => {
         // Create a new login request
         const loginRequest = new AdminLoginRequest({
           adminId: admin._id,
-          phone: admin.phone,
+          email: admin.email,
         });
 
         await loginRequest.save();
 
         // Change authStatus to Pending
-        await Admin.findOneAndUpdate({ phone }, { authStatus: "pending" });
+        await Admin.findOneAndUpdate({ email }, { authStatus: "pending" });
 
         return res
           .status(200)
@@ -341,7 +341,7 @@ exports.EditBusiness = async (req, res) => {
     category,
     description,
     phone,
-    email,
+    businessEmail,
     website,
     socialMedia,
     location,
@@ -355,7 +355,7 @@ exports.EditBusiness = async (req, res) => {
     if (category) updateData.category = category;
     if (description) updateData.description = description;
     if (phone) updateData.phone = phone;
-    if (email) updateData.email = email;
+    if (businessEmail) updateData.businessEmail = businessEmail;
     if (website) updateData.website = website;
     if (socialMedia) updateData.socialMedia = socialMedia;
 
